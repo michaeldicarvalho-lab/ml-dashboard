@@ -1596,6 +1596,19 @@ async function confirmarFechamento() {
     });
     await batch.commit();
 
+    // 3 — Registrar na fila de pendentes para o App Script processar
+    //     Chave única: OPERACAO_DATA_CICLO — evita duplicatas
+    const filaRef = fstore.collection('fila_pendente').doc(`${currentOperation}_${data}_${ciclo}`);
+    await filaRef.set({
+      operacao:    currentOperation,
+      data,
+      ciclo,
+      operador,
+      timestamp:   ts,
+      processado:  false,
+      totalRotas:  drivers.length,
+    });
+
     statusEl.textContent = `✅ Turno ${ciclo} do dia ${data} salvo com sucesso! ${drivers.length} rotas gravadas no histórico.`;
     statusEl.className = 'ft-status ok';
 
