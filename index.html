@@ -47,6 +47,40 @@ window._fbLoaded = false;
   --purple:#4a148c;--purple-bg:#f3e5f5;
   --radius:10px;--radius-sm:6px;
 }
+/* ── DARK THEME ── */
+[data-theme="dark"]{
+  --bg:#0f1419;--surface:#1a1f29;--surface2:#222837;--border:#2c3344;
+  --text:#e6e8eb;--text2:#9aa4b2;--text3:#6b7585;
+  --green:#69f0ae;--green-mid:#4caf50;--green-bg:rgba(76,175,80,.18);
+  --amber:#ffb74d;--amber-mid:#ff9800;--amber-bg:rgba(255,152,0,.18);
+  --red:#ff6e6e;--red-mid:#ef5350;--red-bg:rgba(239,83,80,.18);
+  --blue:#82b1ff;--blue-mid:#42a5f5;--blue-bg:rgba(66,165,245,.18);
+  --purple:#ce93d8;--purple-bg:rgba(206,147,216,.18);
+}
+[data-theme="dark"] tbody tr:hover{background:rgba(66,165,245,.08);}
+[data-theme="dark"] tr.total-row{background:rgba(66,165,245,.15)!important;}
+[data-theme="dark"] .alert-card,
+[data-theme="dark"] .paused-card{background:var(--surface2);}
+[data-theme="dark"] .paused-section{background:var(--surface);border-color:#ff9800;}
+[data-theme="dark"] .paused-card{background:rgba(255,152,0,.1);border-color:rgba(255,152,0,.4);}
+[data-theme="dark"] .pnr-badge{background:rgba(194,24,91,.25);color:#ff80ab;border-color:#c2185b;}
+[data-theme="dark"] .badge-pink{background:rgba(194,24,91,.2);color:#ff80ab;}
+[data-theme="dark"] .guide-card{background:rgba(13,71,161,.18);border-color:rgba(13,71,161,.45);}
+[data-theme="dark"] .guide-card h2{color:var(--blue);}
+[data-theme="dark"] .step{background:var(--surface2);border-color:rgba(13,71,161,.45);}
+[data-theme="dark"] .fb-setup{background:rgba(230,81,0,.12);border-color:#ff9800;}
+[data-theme="dark"] .fb-setup h2,[data-theme="dark"] .fb-steps h3{color:var(--amber);}
+[data-theme="dark"] .fb-steps,[data-theme="dark"] .fb-step-item code{background:var(--surface2);color:var(--text);border-color:var(--border);}
+[data-theme="dark"] .import-card{border-color:#445;}
+[data-theme="dark"] thead th{background:var(--surface2);}
+[data-theme="dark"] .filter-btn,[data-theme="dark"] .snap-btn{background:var(--surface2);}
+[data-theme="dark"] .filter-btn.active,[data-theme="dark"] .snap-btn.active{background:rgba(66,165,245,.2);color:var(--blue);border-color:var(--blue-mid);}
+[data-theme="dark"] .modal-overlay,[data-theme="dark"] .ft-overlay{background:rgba(0,0,0,.7);}
+[data-theme="dark"] .ft-modal h2{color:var(--green);}
+[data-theme="dark"] input,[data-theme="dark"] textarea,[data-theme="dark"] select{color-scheme:dark;}
+/* Theme toggle button */
+.theme-toggle{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.32);border-radius:99px;padding:4px 10px;font-size:13px;color:#fff;cursor:pointer;display:flex;align-items:center;gap:4px;transition:all .15s;}
+.theme-toggle:hover{background:rgba(255,255,255,.28);}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif;color:var(--text);font-size:14px;}
 
@@ -211,8 +245,18 @@ textarea#rawInput:focus{outline:2px solid var(--blue-mid);border-color:transpare
 .table-header{padding:11px 13px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:7px;border-bottom:1px solid var(--border);}
 .table-header h3{font-size:13px;font-weight:600;}
 .table-controls{display:flex;gap:5px;flex-wrap:wrap;align-items:center;}
-.filter-btn{font-size:11px;padding:3px 10px;border-radius:99px;border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;}
+.filter-btn{font-size:11px;padding:3px 10px;border-radius:99px;border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;transition:all .12s;}
+.filter-btn:hover{background:var(--surface2);}
 .filter-btn.active{background:var(--blue-bg);color:var(--blue);border-color:#90caf9;font-weight:600;}
+.adv-filters{padding:10px 13px;border-top:1px solid var(--border);background:var(--surface2);display:flex;flex-wrap:wrap;gap:14px;align-items:center;}
+.filter-group{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.filter-group-label{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-right:3px;}
+.nex-select{font-size:11px;padding:4px 9px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;min-width:120px;}
+.nex-select:focus{border-color:var(--blue-mid);outline:none;}
+.filter-hint{font-size:10px;color:var(--text3);flex-basis:100%;}
+.filter-hint kbd{background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-family:monospace;font-size:9px;color:var(--text2);}
+.filter-count{font-size:10px;font-weight:700;background:var(--blue-mid);color:#fff;border-radius:99px;padding:2px 8px;}
+.sort-indicator{font-size:9px;color:var(--blue-mid);margin-left:2px;}
 input#searchInput{font-size:11px;padding:4px 9px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface2);color:var(--text);outline:none;width:140px;}
 input#searchInput:focus{border-color:var(--blue-mid);}
 .table-wrap{overflow-x:auto;}
@@ -289,6 +333,32 @@ tr.total-row td{border-top:2px solid #90a4ae;font-size:11px;color:var(--blue);}
 .ops-tab-add:hover{color:#fff;border-color:#fff;}
 .ops-indicator{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;background:#69f0ae;}
 .ops-indicator.empty{background:rgba(255,255,255,.3);}
+/* Aba especial GERAL */
+.ops-tab.geral-tab{background:linear-gradient(135deg,rgba(255,193,7,.2),rgba(255,152,0,.15));border:1px solid rgba(255,193,7,.4);}
+.ops-tab.geral-tab.active{background:linear-gradient(135deg,#ffc107,#ff9800);color:#1a237e;border-color:#ff9800;}
+.ops-tab.geral-tab .ops-indicator{background:#ffc107;}
+/* Visão Geral (consolidada) */
+.geral-view{display:none;}
+.geral-view.active{display:block;}
+.geral-banner{background:linear-gradient(135deg,#1a237e,#1565c0);color:#fff;border-radius:var(--radius);padding:16px 20px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.geral-banner h2{font-size:18px;font-weight:700;margin-bottom:3px;}
+.geral-banner p{font-size:12px;opacity:.85;}
+.geral-banner .geral-refresh{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:var(--radius-sm);padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;}
+.geral-banner .geral-refresh:hover{background:rgba(255,255,255,.3);}
+.geral-rank-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:13px;}
+.geral-rank-card h3{font-size:13px;font-weight:600;margin-bottom:10px;}
+.geral-rank-table{width:100%;border-collapse:collapse;font-size:12px;}
+.geral-rank-table th{text-align:left;padding:7px 9px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;}
+.geral-rank-table td{padding:8px 9px;border-bottom:1px solid var(--border);}
+.geral-rank-table tr:last-child td{border-bottom:none;}
+.geral-rank-table tr:hover{background:var(--surface2);cursor:pointer;}
+.rank-pos{display:inline-block;width:22px;height:22px;border-radius:50%;background:var(--blue-bg);color:var(--blue);font-weight:700;font-size:11px;text-align:center;line-height:22px;margin-right:8px;}
+.rank-pos-1{background:#ffd700;color:#5d4037;}
+.rank-pos-2{background:#c0c0c0;color:#424242;}
+.rank-pos-3{background:#cd7f32;color:#fff;}
+.geral-empty{background:var(--surface2);color:var(--text3);padding:24px;text-align:center;border-radius:var(--radius);font-size:13px;}
+.geral-chart-wrap{position:relative;height:320px;width:100%;}
+@media(max-width:768px){.geral-chart-wrap{height:240px;}}
 /* ── HEADER SUBTITLE ── */
 .op-name-badge{background:rgba(255,255,255,.18);border-radius:5px;padding:1px 8px;font-size:11px;margin-left:8px;font-weight:400;}
 </style>
@@ -317,11 +387,15 @@ tr.total-row td{border-top:2px solid #90a4ae;font-size:11px;color:var(--blue);}
     </div>
     <div class="sync-badge" id="syncBadge">⟳ Sincronizando...</div>
     <div class="badge-live"><div class="dot-live dot-connecting" id="connDot"></div><span id="liveStatus">Conectando</span></div>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Alternar tema claro/escuro">🌙</button>
   </div>
 </div>
 
 <!-- OPERATION TABS -->
 <div class="ops-tabs" id="opsTabs">
+  <button class="ops-tab geral-tab" data-op="GERAL" onclick="switchOperation('GERAL',this)" title="Visão consolidada de todas as operações">
+    <span class="ops-indicator" id="ind-GERAL"></span>📊 Geral
+  </button>
   <button class="ops-tab active" data-op="SSP6" onclick="switchOperation('SSP6',this)">
     <span class="ops-indicator empty" id="ind-SSP6"></span>SSP6
   </button>
@@ -365,6 +439,59 @@ tr.total-row td{border-top:2px solid #90a4ae;font-size:11px;color:var(--blue);}
 
 
 <div class="main">
+
+<!-- VISÃO CONSOLIDADA (GERAL) — exibida apenas quando aba GERAL está ativa -->
+<div class="geral-view" id="geralView">
+  <div class="geral-banner">
+    <div>
+      <h2>📊 Visão Consolidada — Todas as Operações</h2>
+      <p>Soma em tempo real de todas as 13 operações ativas. Última atualização: <span id="geralLastUpdate">—</span></p>
+    </div>
+    <button class="geral-refresh" onclick="refreshGeralData()">⟳ Recarregar</button>
+  </div>
+
+  <!-- KPIs Consolidados -->
+  <div class="kpi-grid" id="geralKpiGrid">
+    <div class="kpi"><div class="k-label">Operações ativas</div><div class="k-val" id="g-ops">—</div><div class="k-sub">de 13</div></div>
+    <div class="kpi"><div class="k-label">Total Rotas</div><div class="k-val" id="g-rotas">—</div><div class="k-sub">somadas</div></div>
+    <div class="kpi"><div class="k-label">Total Pacotes</div><div class="k-val" id="g-pacotes">—</div><div class="k-sub">SPR somado</div></div>
+    <div class="kpi kpi-green"><div class="k-label">Bem-sucedidos</div><div class="k-val" id="g-ok">—</div><div class="k-sub" id="g-ok-pct">—</div></div>
+    <div class="kpi kpi-amber"><div class="k-label">Pendentes</div><div class="k-val" id="g-pend">—</div><div class="k-sub" id="g-pend-pct">—</div></div>
+    <div class="kpi kpi-red"><div class="k-label">Falhas</div><div class="k-val" id="g-fail">—</div><div class="k-sub" id="g-fail-pct">—</div></div>
+    <div class="kpi kpi-purple"><div class="k-label">DS Geral</div><div class="k-val" id="g-ds">—</div><div class="k-sub">média ponderada</div></div>
+    <div class="kpi kpi-blue"><div class="k-label">Concluídas</div><div class="k-val" id="g-conc">—</div><div class="k-sub" id="g-conc-pct">rotas finalizadas</div></div>
+  </div>
+
+  <!-- Gráfico de comparação DS% por operação -->
+  <div class="chart-card">
+    <h3>Comparação DS% por operação</h3>
+    <div class="geral-chart-wrap"><canvas id="geralCompareChart"></canvas></div>
+  </div>
+
+  <!-- Tabela de ranking de operações -->
+  <div class="geral-rank-card">
+    <h3>🏆 Ranking de Operações</h3>
+    <div style="overflow-x:auto">
+      <table class="geral-rank-table" id="geralRankTable">
+        <thead><tr>
+          <th>#</th>
+          <th>Operação</th>
+          <th>Rotas</th>
+          <th>SPR</th>
+          <th>OK</th>
+          <th>Pend</th>
+          <th>Falhas</th>
+          <th>DS%</th>
+          <th>Concluídas</th>
+          <th>Atualizado</th>
+        </tr></thead>
+        <tbody id="geralRankBody">
+          <tr><td colspan="10" class="geral-empty">Carregando dados de todas as operações…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
 <!-- FIREBASE SETUP PANEL -->
 <div class="fb-setup" id="fbSetup" style="display:none">
@@ -519,28 +646,54 @@ tr.total-row td{border-top:2px solid #90a4ae;font-size:11px;color:var(--blue);}
   <div class="table-header">
     <h3>Detalhamento por motorista</h3>
     <div class="table-controls">
-      <button class="filter-btn active" onclick="setFilter('all',this)">Todos</button>
-      <button class="filter-btn" onclick="setFilter('alert',this)">⚠ Alertas</button>
-      <button class="filter-btn" onclick="setFilter('fail',this)">✗ Falhas</button>
-      <button class="filter-btn" onclick="setFilter('low',this)">↓ Baixo progresso</button>
-      <button class="filter-btn" onclick="setFilter('concluida',this)">✓ Concluídas</button>
+      <button class="filter-btn" data-quick="alert" onclick="toggleQuickFilter('alert',this)">⚠ Alertas</button>
+      <button class="filter-btn" data-quick="fail" onclick="toggleQuickFilter('fail',this)">✗ Falhas</button>
+      <button class="filter-btn" data-quick="low" onclick="toggleQuickFilter('low',this)">↓ Baixo progresso</button>
+      <button class="filter-btn" data-quick="concluida" onclick="toggleQuickFilter('concluida',this)">✓ Concluídas</button>
+      <button class="filter-btn" data-quick="andamento" onclick="toggleQuickFilter('andamento',this)">● Em andamento</button>
       <input id="searchInput" type="text" placeholder="🔍 Buscar..." oninput="renderTable()">
+      <button class="btn-secondary" onclick="toggleAdvFilters(this)" id="advToggleBtn">▾ Avançado</button>
+      <button class="btn-secondary" onclick="clearAllFilters()" title="Limpar todos os filtros">✕ Limpar</button>
       <button class="btn-secondary" onclick="exportCSV()" title="Exportar tabela como CSV">⬇ CSV</button>
+      <span class="filter-count" id="filterCount" style="display:none"></span>
+    </div>
+    <div class="adv-filters" id="advFilters" style="display:none">
+      <div class="filter-group">
+        <span class="filter-group-label">Veículo:</span>
+        <button class="filter-btn" data-vec="Walker" onclick="toggleVecFilter('Walker',this)">🚶 Walker</button>
+        <button class="filter-btn" data-vec="Moto" onclick="toggleVecFilter('Moto',this)">🏍 Moto</button>
+        <button class="filter-btn" data-vec="Veículo" onclick="toggleVecFilter('Veículo',this)">🚗 Veículo</button>
+        <button class="filter-btn" data-vec="Utilitário" onclick="toggleVecFilter('Utilitário',this)">🚚 Utilitário</button>
+      </div>
+      <div class="filter-group">
+        <span class="filter-group-label">Flags:</span>
+        <button class="filter-btn" data-flag="atrasada" onclick="toggleFlagFilter('atrasada',this)">⏱ Atrasada</button>
+        <button class="filter-btn" data-flag="mista" onclick="toggleFlagFilter('mista',this)">🔀 Mista</button>
+        <button class="filter-btn" data-flag="pnr" onclick="toggleFlagFilter('pnr',this)">⚡ PNR</button>
+        <button class="filter-btn" data-flag="foraArea" onclick="toggleFlagFilter('foraArea',this)">📍 Fora área</button>
+      </div>
+      <div class="filter-group">
+        <span class="filter-group-label">Agência NEX:</span>
+        <select class="nex-select" id="nexSelect" onchange="setNexFilter(this.value)">
+          <option value="">Todas</option>
+        </select>
+      </div>
+      <div class="filter-hint">💡 Segure <kbd>Shift</kbd> ao clicar nas colunas para ordenar por múltiplas</div>
     </div>
   </div>
   <div class="table-wrap">
     <table>
       <thead><tr>
-        <th onclick="sortTable('nome')">Motorista ↕</th>
-        <th onclick="sortTable('rota')">Rota ↕</th>
-        <th onclick="sortTable('spr')">SPR ↕</th>
-        <th onclick="sortTable('ok')">Entregues ↕</th>
-        <th onclick="sortTable('pend')">Pendentes ↕</th>
-        <th onclick="sortTable('fail')">Falhas ↕</th>
-        <th onclick="sortTable('pct')">DS % ↕</th>
-        <th onclick="sortTable('ozh')">OZH ↕</th>
-        <th onclick="sortTable('pkgH')" title="Pacotes entregues por hora">Pkg/h ↕</th>
-        <th onclick="sortTable('orh')">ORH Exec/Plan ↕</th>
+        <th onclick="sortTable('nome',event)">Motorista ↕</th>
+        <th onclick="sortTable('rota',event)">Rota ↕</th>
+        <th onclick="sortTable('spr',event)">SPR ↕</th>
+        <th onclick="sortTable('ok',event)">Entregues ↕</th>
+        <th onclick="sortTable('pend',event)">Pendentes ↕</th>
+        <th onclick="sortTable('fail',event)">Falhas ↕</th>
+        <th onclick="sortTable('pct',event)">DS % ↕</th>
+        <th onclick="sortTable('ozh',event)">OZH ↕</th>
+        <th onclick="sortTable('pkgH',event)" title="Pacotes entregues por hora">Pkg/h ↕</th>
+        <th onclick="sortTable('orh',event)">ORH Exec/Plan ↕</th>
         <th>Últ. Entrega</th>
         <th>Status</th>
         <th>Alertas</th>
@@ -632,8 +785,15 @@ let drivers = [];
 let extras = {};
 let snapshots = [];
 let pausedRoutes = [];
-let currentFilter = 'all';
+// Filtros avançados — todos os arrays vazios = sem filtro (mostra tudo)
+let filterState = {
+  quick: [],      // ['alert','fail','low','concluida','andamento'] — multi-select
+  vehicles: [],   // ['Walker','Moto','Veículo','Utilitário']
+  flags: [],      // ['atrasada','mista','pnr','foraArea']
+  nex: '',        // string vazio = todas as agências
+};
 let sortKey2 = 'pct', sortAsc2 = false;
+let sortStack = []; // ordenação multi-coluna: [{key:'pct',asc:false}, ...]
 let charts = {};
 let modalRota = null;
 
@@ -1050,6 +1210,7 @@ function loadSampleData(){document.getElementById('rawInput').value=SAMPLE_DATA;
 // ═══════════════════════════════════════════════════
 function updateAll(){
   updateKPIs();renderQuickView();updateAlerts();
+  populateNexDropdown();
   renderTable();renderCharts();renderFalhasResume();
 }
 
@@ -1120,19 +1281,120 @@ function updateAlerts(){
 // ═══════════════════════════════════════════════════
 // TABLE
 // ═══════════════════════════════════════════════════
-function sortTable(key){if(sortKey2===key)sortAsc2=!sortAsc2;else{sortKey2=key;sortAsc2=false;}renderTable();}
-function setFilter(f,btn){currentFilter=f;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderTable();}
+// Mapa de filtros rápidos (toggleQuickFilter) → predicado
+const QUICK_FILTERS = {
+  alert:    d => d.atrasada || d.fechando || d.foraArea > 0 || d.ambu || (extras[d.rota] && extras[d.rota].pnr),
+  fail:     d => d.fail > 0,
+  low:      d => pct(d) < 50,
+  concluida:d => d.status === 'Concluída',
+  andamento:d => d.status === 'Em andamento',
+};
+const FLAG_FILTERS = {
+  atrasada: d => d.atrasada,
+  mista:    d => d.isMista,
+  pnr:      d => extras[d.rota] && extras[d.rota].pnr,
+  foraArea: d => d.foraArea > 0,
+};
+
+function toggleQuickFilter(f, btn) {
+  const i = filterState.quick.indexOf(f);
+  if (i >= 0) filterState.quick.splice(i, 1); else filterState.quick.push(f);
+  btn.classList.toggle('active');
+  renderTable();
+}
+function toggleVecFilter(v, btn) {
+  const i = filterState.vehicles.indexOf(v);
+  if (i >= 0) filterState.vehicles.splice(i, 1); else filterState.vehicles.push(v);
+  btn.classList.toggle('active');
+  renderTable();
+}
+function toggleFlagFilter(f, btn) {
+  const i = filterState.flags.indexOf(f);
+  if (i >= 0) filterState.flags.splice(i, 1); else filterState.flags.push(f);
+  btn.classList.toggle('active');
+  renderTable();
+}
+function setNexFilter(v) {
+  filterState.nex = v;
+  renderTable();
+}
+function toggleAdvFilters(btn) {
+  const panel = document.getElementById('advFilters');
+  const open = panel.style.display === 'none' || !panel.style.display;
+  panel.style.display = open ? 'flex' : 'none';
+  btn.textContent = open ? '▴ Avançado' : '▾ Avançado';
+}
+function clearAllFilters() {
+  filterState = { quick:[], vehicles:[], flags:[], nex:'' };
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  const nex = document.getElementById('nexSelect'); if (nex) nex.value = '';
+  const search = document.getElementById('searchInput'); if (search) search.value = '';
+  renderTable();
+}
+
+// Ordenação multi-coluna — Shift+click adiciona à pilha; click sozinho reseta
+function sortTable(key, event) {
+  const shift = event && event.shiftKey;
+  if (shift) {
+    const existing = sortStack.find(s => s.key === key);
+    if (existing) existing.asc = !existing.asc;
+    else sortStack.push({ key, asc: false });
+  } else {
+    if (sortKey2 === key) sortAsc2 = !sortAsc2;
+    else { sortKey2 = key; sortAsc2 = false; }
+    sortStack = [{ key: sortKey2, asc: sortAsc2 }];
+  }
+  renderTable();
+}
+
+// Popula dropdown de agência NEX a partir dos dados
+function populateNexDropdown() {
+  const sel = document.getElementById('nexSelect');
+  if (!sel) return;
+  const set = new Set();
+  drivers.forEach(d => { if (d.nexAgencia) set.add(d.nexAgencia); });
+  const current = filterState.nex;
+  sel.innerHTML = '<option value="">Todas</option>' +
+    [...set].sort().map(n => `<option value="${n}">${n}</option>`).join('');
+  if (current && set.has(current)) sel.value = current;
+}
 
 function renderTable(){
   const q=(document.getElementById('searchInput').value||'').toLowerCase();
   let data=[...drivers];
-  if(currentFilter==='alert')data=data.filter(d=>d.atrasada||d.fechando||d.foraArea>0||d.ambu||(extras[d.rota]&&extras[d.rota].pnr));
-  else if(currentFilter==='fail')data=data.filter(d=>d.fail>0);
-  else if(currentFilter==='low')data=data.filter(d=>pct(d)<50);
-  else if(currentFilter==='concluida')data=data.filter(d=>d.status==='Concluída');
+  // Aplica filtros quick (OR entre eles — se vários ativos, mostra rotas que casem com QUALQUER um)
+  if (filterState.quick.length) {
+    data = data.filter(d => filterState.quick.some(f => QUICK_FILTERS[f] && QUICK_FILTERS[f](d)));
+  }
+  // Veículo (OR)
+  if (filterState.vehicles.length) {
+    data = data.filter(d => filterState.vehicles.includes(d.tipoVeiculo));
+  }
+  // Flags (AND — todas precisam ser verdadeiras)
+  if (filterState.flags.length) {
+    data = data.filter(d => filterState.flags.every(f => FLAG_FILTERS[f] && FLAG_FILTERS[f](d)));
+  }
+  // NEX
+  if (filterState.nex) data = data.filter(d => d.nexAgencia === filterState.nex);
   if(q)data=data.filter(d=>d.nome.toLowerCase().includes(q)||d.rota.toLowerCase().includes(q));
-  const get=d=>({rota:d.rota,nome:d.nome,spr:d.spr,ok:d.ok,pend:d.pend,fail:d.fail,pct:pct(d),ozh:timeToHrs(d.ozh),orh:timeToHrs(d.orhExec),pkgH:parseFloat(pkgPorHora(d))||0}[sortKey2]||0);
-  data.sort((a,b)=>sortAsc2?(get(a)>get(b)?1:-1):(get(a)<get(b)?1:-1));
+  // Ordenação — suporta multi-coluna via sortStack
+  const getVal = (d, key) => ({rota:d.rota,nome:d.nome,spr:d.spr,ok:d.ok,pend:d.pend,fail:d.fail,pct:pct(d),ozh:timeToHrs(d.ozh),orh:timeToHrs(d.orhExec),pkgH:parseFloat(pkgPorHora(d))||0}[key]||0);
+  const stack = sortStack.length ? sortStack : [{key:sortKey2,asc:sortAsc2}];
+  data.sort((a,b)=>{
+    for (const s of stack) {
+      const av=getVal(a,s.key), bv=getVal(b,s.key);
+      if (av < bv) return s.asc ? -1 : 1;
+      if (av > bv) return s.asc ? 1 : -1;
+    }
+    return 0;
+  });
+  // Atualiza contador de filtros ativos
+  const fc = document.getElementById('filterCount');
+  if (fc) {
+    const total = filterState.quick.length + filterState.vehicles.length + filterState.flags.length + (filterState.nex ? 1 : 0);
+    fc.textContent = total ? `${total} filtro${total>1?'s':''} ativo${total>1?'s':''} · ${data.length} resultado${data.length!==1?'s':''}` : '';
+    fc.style.display = total ? 'inline-block' : 'none';
+  }
   const tb=document.getElementById('tableBody');
   if(!data.length){tb.innerHTML='<tr><td colspan="14" style="text-align:center;padding:18px;color:var(--text3)">Nenhum resultado</td></tr>';return;}
   let rows='',totSpr=0,totOk=0,totPend=0,totFail=0;
@@ -1404,22 +1666,69 @@ const opState = OPERATIONS.reduce((acc, op) => {
 function switchOperation(op, btn) {
   if (op === currentOperation) return;
 
-  // Save current op state
-  opState[currentOperation].drivers = [...drivers];
-  opState[currentOperation].extras  = {...extras};
-  opState[currentOperation].snapshots = [...snapshots];
-  opState[currentOperation].pausedRoutes = [...pausedRoutes];
+  // Salvar estado da op anterior — pular se vinha do modo GERAL (não há op "real")
+  if (currentOperation !== 'GERAL' && opState[currentOperation]) {
+    opState[currentOperation].drivers = [...drivers];
+    opState[currentOperation].extras  = {...extras};
+    opState[currentOperation].snapshots = [...snapshots];
+    opState[currentOperation].pausedRoutes = [...pausedRoutes];
+  }
 
-  // Detach listeners from old operation
+  // Detach listeners
   if (db) {
-    const oldPfx = currentOperation.toLowerCase().replace(/[^a-z0-9]/g,'_');
-    db.ref(oldPfx + '/currentData').off();
-    db.ref(oldPfx + '/snapshots').off();
-    db.ref(oldPfx + '/paused').off();
-    db.ref(oldPfx + '/online').off();
+    if (currentOperation === 'GERAL') {
+      detachGeralListeners();
+    } else {
+      const oldPfx = currentOperation.toLowerCase().replace(/[^a-z0-9]/g,'_');
+      db.ref(oldPfx + '/currentData').off();
+      db.ref(oldPfx + '/snapshots').off();
+      db.ref(oldPfx + '/paused').off();
+      db.ref(oldPfx + '/online').off();
+    }
   }
 
   currentOperation = op;
+
+  // Toggle visibilidade da Geral View vs UI normal
+  const geralView = document.getElementById('geralView');
+  const normalIds = ['guideCard','importCard','kpiGrid','quickviewSection','alertsSection','pausedSection','chartsRow1','chartsRow2','evoCard','falhasCard','tableCard'];
+  if (op === 'GERAL') {
+    if (geralView) geralView.classList.add('active');
+    normalIds.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+    document.getElementById('opNameBadge').textContent = '📊 Geral';
+    document.title = 'Dashboard Geral · Mercado Envios';
+    document.querySelectorAll('.ops-tab').forEach(t => t.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    const hm = document.getElementById('headerMeta');
+    if (hm) hm.textContent = 'Visão consolidada de todas as 13 operações';
+    // Reset filters (não se aplicam em GERAL)
+    filterState = { quick:[], vehicles:[], flags:[], nex:'' };
+    sortStack = [];
+    if (db && firebaseConnected) attachGeralListeners();
+    renderGeralView();
+    return;
+  } else {
+    if (geralView) geralView.classList.remove('active');
+    // Restaurar visibilidade — só os que devem estar visíveis quando conectado
+    if (firebaseConnected) {
+      ['importCard','kpiGrid','quickviewSection','pausedSection','chartsRow1','chartsRow2','tableCard'].forEach(id => {
+        const el = document.getElementById(id); if (el) el.style.display = '';
+      });
+    }
+  }
+
+  // Reset filter state ao trocar de operação (dados diferentes, NEX diferentes)
+  filterState = { quick:[], vehicles:[], flags:[], nex:'' };
+  sortStack = [];
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  const advPanel = document.getElementById('advFilters');
+  if (advPanel) advPanel.style.display = 'none';
+  const advBtn = document.getElementById('advToggleBtn');
+  if (advBtn) advBtn.textContent = '▾ Avançado';
+  const fc = document.getElementById('filterCount');
+  if (fc) fc.style.display = 'none';
+  const sb = document.getElementById('searchInput');
+  if (sb) sb.value = '';
 
   // Restore saved state for new op
   drivers       = [...(opState[op].drivers || [])];
@@ -1466,6 +1775,199 @@ function switchOperation(op, btn) {
   const ta = document.getElementById('rawInput');
   if (ta) ta.placeholder = 'Cole aqui o texto copiado do monitoramento ' + op + '...';
 }
+
+// ═══════════════════════════════════════════════════
+// VISÃO CONSOLIDADA (GERAL) — listeners em massa + agregação
+// ═══════════════════════════════════════════════════
+let geralCache = {}; // { SSP6: {drivers, extras, updatedAt}, SSP9: {...}, ... }
+let geralListenersAttached = false;
+
+function attachGeralListeners() {
+  if (!db || geralListenersAttached) return;
+  geralListenersAttached = true;
+  OPERATIONS.forEach(op => {
+    const pfx = op.toLowerCase().replace(/[^a-z0-9]/g,'_');
+    db.ref(pfx + '/currentData').on('value', snap => {
+      const data = snap.val();
+      geralCache[op] = data ? {
+        drivers: data.drivers || [],
+        extras:  data.extras  || {},
+        updatedAt: data.updatedAt || null,
+        updatedBy: data.updatedBy || '',
+      } : { drivers: [], extras: {}, updatedAt: null, updatedBy: '' };
+      // Re-renderiza apenas se estamos olhando a GERAL agora
+      if (currentOperation === 'GERAL') renderGeralView();
+    });
+  });
+}
+
+function detachGeralListeners() {
+  if (!db) return;
+  OPERATIONS.forEach(op => {
+    const pfx = op.toLowerCase().replace(/[^a-z0-9]/g,'_');
+    db.ref(pfx + '/currentData').off();
+  });
+  geralListenersAttached = false;
+}
+
+// Botão "Recarregar" — força um fetch dos dados de todas as operações
+function refreshGeralData() {
+  if (!db) { alert('Firebase não conectado.'); return; }
+  const btn = document.querySelector('.geral-refresh');
+  if (btn) { btn.disabled = true; btn.textContent = '⟳ Carregando...'; }
+  Promise.all(OPERATIONS.map(op => {
+    const pfx = op.toLowerCase().replace(/[^a-z0-9]/g,'_');
+    return db.ref(pfx + '/currentData').once('value').then(snap => {
+      const data = snap.val();
+      geralCache[op] = data ? {
+        drivers: data.drivers || [],
+        extras:  data.extras  || {},
+        updatedAt: data.updatedAt || null,
+        updatedBy: data.updatedBy || '',
+      } : { drivers: [], extras: {}, updatedAt: null, updatedBy: '' };
+    });
+  })).then(() => {
+    renderGeralView();
+    if (btn) { btn.disabled = false; btn.textContent = '⟳ Recarregar'; }
+  }).catch(e => {
+    console.error('refreshGeralData error:', e);
+    if (btn) { btn.disabled = false; btn.textContent = '⟳ Recarregar'; }
+  });
+}
+
+// Calcula agregados de uma operação a partir do cache
+function aggregateOp(op) {
+  const data = geralCache[op];
+  if (!data || !data.drivers || !data.drivers.length) return null;
+  const drv = data.drivers;
+  const totalSpr = drv.reduce((s,d)=>s+(d.spr||0),0);
+  const totalOk  = drv.reduce((s,d)=>s+(d.ok||0),0);
+  const totalPend= drv.reduce((s,d)=>s+(d.pend||0),0);
+  const totalFail= drv.reduce((s,d)=>s+(d.fail||0),0);
+  const conc     = drv.filter(d=>d.status==='Concluída').length;
+  const ds       = totalSpr > 0 ? (totalOk/totalSpr*100) : 0;
+  return {
+    op, rotas: drv.length, spr: totalSpr, ok: totalOk, pend: totalPend,
+    fail: totalFail, ds, concluidas: conc, updatedAt: data.updatedAt,
+  };
+}
+
+function renderGeralView() {
+  const aggs = OPERATIONS.map(op => aggregateOp(op)).filter(a => a !== null);
+  // Atualizar texto "última atualização"
+  const latest = aggs.reduce((m,a) => a.updatedAt && a.updatedAt > m ? a.updatedAt : m, 0);
+  const lu = document.getElementById('geralLastUpdate');
+  if (lu) lu.textContent = latest ? new Date(latest).toLocaleString('pt-BR') : 'aguardando dados…';
+
+  // KPIs consolidados
+  const totalRotas = aggs.reduce((s,a)=>s+a.rotas,0);
+  const totalSpr   = aggs.reduce((s,a)=>s+a.spr,0);
+  const totalOk    = aggs.reduce((s,a)=>s+a.ok,0);
+  const totalPend  = aggs.reduce((s,a)=>s+a.pend,0);
+  const totalFail  = aggs.reduce((s,a)=>s+a.fail,0);
+  const totalConc  = aggs.reduce((s,a)=>s+a.concluidas,0);
+  const dsGeral    = totalSpr > 0 ? (totalOk/totalSpr*100) : 0;
+  const set = (id,v) => { const e = document.getElementById(id); if(e) e.textContent = v; };
+  const fmt = n => (n||0).toLocaleString('pt-BR');
+  const pct = (n,t) => t > 0 ? ((n/t*100).toFixed(1) + '%') : '—';
+  set('g-ops', aggs.length);
+  set('g-rotas', fmt(totalRotas));
+  set('g-pacotes', fmt(totalSpr));
+  set('g-ok', fmt(totalOk));      set('g-ok-pct',  pct(totalOk, totalSpr));
+  set('g-pend', fmt(totalPend));  set('g-pend-pct',pct(totalPend, totalSpr));
+  set('g-fail', fmt(totalFail));  set('g-fail-pct',pct(totalFail, totalSpr));
+  set('g-ds', dsGeral.toFixed(1) + '%');
+  set('g-conc', totalConc + ' / ' + totalRotas);
+  set('g-conc-pct', pct(totalConc, totalRotas) + ' finalizadas');
+
+  // Ranking
+  const ranked = [...aggs].sort((a,b)=>b.ds-a.ds);
+  const tbody = document.getElementById('geralRankBody');
+  if (tbody) {
+    if (!ranked.length) {
+      tbody.innerHTML = '<tr><td colspan="10" class="geral-empty">Nenhuma operação com dados ainda. Importe dados em alguma aba SSP para aparecer aqui.</td></tr>';
+    } else {
+      tbody.innerHTML = ranked.map((a, i) => {
+        const pos = i + 1;
+        const posClass = pos <= 3 ? `rank-pos rank-pos-${pos}` : 'rank-pos';
+        const dsColor = a.ds >= 80 ? 'var(--green-mid)' : a.ds >= 50 ? 'var(--amber-mid)' : 'var(--red)';
+        const upd = a.updatedAt ? new Date(a.updatedAt).toLocaleString('pt-BR', {hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'}) : '—';
+        return `<tr onclick="switchOperationByName('${a.op}')" title="Clique para abrir a operação ${a.op}">
+          <td><span class="${posClass}">${pos}</span></td>
+          <td><strong>${a.op}</strong></td>
+          <td>${a.rotas}</td>
+          <td>${fmt(a.spr)}</td>
+          <td style="color:var(--green-mid);font-weight:600">${fmt(a.ok)}</td>
+          <td style="color:var(--amber-mid)">${fmt(a.pend)}</td>
+          <td style="color:var(--red);font-weight:600">${fmt(a.fail)}</td>
+          <td style="color:${dsColor};font-weight:700">${a.ds.toFixed(1)}%</td>
+          <td>${a.concluidas}/${a.rotas}</td>
+          <td style="font-size:11px;color:var(--text3)">${upd}</td>
+        </tr>`;
+      }).join('');
+    }
+  }
+
+  // Gráfico de comparação DS% por operação
+  const ctx = document.getElementById('geralCompareChart');
+  if (ctx && window.Chart) {
+    if (charts.geralCompare) { charts.geralCompare.destroy(); delete charts.geralCompare; }
+    if (ranked.length) {
+      charts.geralCompare = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ranked.map(a => a.op),
+          datasets: [{
+            label: 'DS%',
+            data: ranked.map(a => parseFloat(a.ds.toFixed(2))),
+            backgroundColor: ranked.map(a => a.ds >= 80 ? '#2e7d32' : a.ds >= 50 ? '#e65100' : '#c62828'),
+            borderRadius: 5,
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => 'DS%: ' + ctx.parsed.y + '%' } } },
+          scales: {
+            y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } },
+            x: { ticks: { font: { size: 11 } } }
+          }
+        }
+      });
+    }
+  }
+}
+
+// Helper para clicar em linha do ranking → abrir a operação
+function switchOperationByName(opName) {
+  const btn = document.querySelector('.ops-tab[data-op="' + opName + '"]');
+  if (btn) btn.click();
+}
+
+// ═══════════════════════════════════════════════════
+// DARK MODE — persistente via localStorage
+// ═══════════════════════════════════════════════════
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const btn = document.getElementById('themeToggle');
+  if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+  // Re-renderizar para pegar as novas cores do tema
+  if (currentOperation === 'GERAL') {
+    try { renderGeralView(); } catch(e) {}
+  } else if (typeof updateAll === 'function' && drivers && drivers.length) {
+    try { updateAll(); } catch(e) {}
+  }
+}
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'light';
+  const next = current === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('ssp_theme', next);
+  applyTheme(next);
+}
+// Aplicar tema salvo no carregamento
+(function initTheme(){
+  const saved = localStorage.getItem('ssp_theme') || 'light';
+  applyTheme(saved);
+})();
 
 // ═══════════════════════════════════════════════════
 // CSV EXPORT
@@ -1578,12 +2080,33 @@ function closeFtModal() {
   document.getElementById('ftOverlay').style.display = 'none';
 }
 
+// Sanitiza string para uso como ID de documento Firestore
+// Firestore não aceita /, ., ..  e há limite de 1500 bytes
+function sanitizeDocId(raw) {
+  if (!raw) return 'sem_id_' + Math.random().toString(36).slice(2,8);
+  const s = String(raw).replace(/[\/\\#\?\.]/g, '_').slice(0, 1500);
+  return s || 'sem_id';
+}
+
 async function confirmarFechamento() {
-  if (!fstore) return;
+  const statusEl = document.getElementById('ftStatus');
+  console.log('[FecharTurno] Iniciando. fstore=', !!fstore, 'firebaseConnected=', firebaseConnected, 'drivers=', drivers?.length);
+
+  // Erro visível em vez de return silencioso
+  if (!fstore) {
+    statusEl.textContent = '❌ Firestore não conectado. Recarregue a página e aguarde a conexão antes de fechar o turno.';
+    statusEl.className = 'ft-status err';
+    return;
+  }
+  if (!drivers || drivers.length === 0) {
+    statusEl.textContent = '❌ Sem dados importados. Importe a operação antes de fechar o turno.';
+    statusEl.className = 'ft-status err';
+    return;
+  }
+
   const ciclo    = document.getElementById('ft-ciclo').value;
   const data     = document.getElementById('ft-data').value;
   const operador = document.getElementById('ft-operador').value.trim() || 'operador';
-  const statusEl = document.getElementById('ftStatus');
 
   if (!data) { statusEl.textContent = 'Informe a data.'; statusEl.className='ft-status err'; return; }
 
@@ -1605,6 +2128,8 @@ async function confirmarFechamento() {
       .collection('turnos')
       .doc(`${data}_${ciclo}`);
 
+    console.log('[FecharTurno] Gravando turno em historico/' + currentOperation + '/turnos/' + data + '_' + ciclo);
+
     await turnoRef.set({
       operacao:   currentOperation,
       data,
@@ -1623,7 +2148,8 @@ async function confirmarFechamento() {
     // 2 — Sub-coleção com cada rota individualmente
     const batch = fstore.batch();
     drivers.forEach(d => {
-      const rotaRef = turnoRef.collection('rotas').doc(d.id || d.rota);
+      const rotaId = sanitizeDocId(d.id || d.rota);
+      const rotaRef = turnoRef.collection('rotas').doc(rotaId);
       batch.set(rotaRef, {
         rota:        d.rota,
         idRota:      d.id || '',
