@@ -1587,15 +1587,14 @@ function parseText(raw){
 
     const atrasada = /rota\s+atrasada/i.test(block);
     const fechando = /prestes\s+a\s+fechar/i.test(block);
-    // Ambulância: marca a rota MÃE que recebe apoio. Padrões detectáveis:
-    //  - Header "Rota #ID" (formato Meli quando ambulância está em andamento) → isAmbuRoute
-    //  - "X ocorrências" (badge no sistema Meli)
-    //  - "ambulância" no texto
-    //  - "Rota com problema" (em alguns casos vem junto)
-    const ocorrM   = block.match(/(\d+)\s+ocorr[êe]ncias?/i);
-    const ambuKw   = /ambul[aâ]ncia/i.test(block);
-    const ambuCount= ocorrM ? +ocorrM[1] : (ambuKw || isAmbuRoute ? 1 : 0);
-    const ambu     = ambuCount > 0 || isAmbuRoute;
+    // Ambulância: ÚNICO gatilho confiável é o header "Rota #ID" (sem código antes do #).
+    // O Meli usa esse formato exclusivamente quando há ambulância ativa em uma rota mãe.
+    // "X ocorrências" sozinho = só indica incidentes da rota (devoluções/falhas), NÃO ambulância.
+    // Já a palavra "ambulância" pode aparecer em outros contextos (tipo veículo etc) — não confiável.
+    const ocorrM = block.match(/(\d+)\s+ocorr[êe]ncias?/i);
+    const ambu   = isAmbuRoute;
+    // Se for ambulância ativa, usa contagem de "ocorrências" como nº de apoios; senão 1
+    const ambuCount = isAmbuRoute ? (ocorrM ? +ocorrM[1] : 1) : 0;
     const foraM    = block.match(/(\d+)\s+fora\s+da\s+[áa]rea/i);
 
     let tipoVeiculo = '';
