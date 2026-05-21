@@ -254,6 +254,20 @@ textarea#rawInput:focus{outline:2px solid var(--blue-mid);border-color:transpare
 .qv-bar-fill{height:100%;border-radius:99px;}
 .qv-pct{font-size:11px;font-weight:700;min-width:28px;}
 .qv-badges{display:flex;flex-wrap:wrap;gap:2px;}
+/* Endereços comerciais vs residenciais — orienta priorização */
+.qv-addresses{display:flex;align-items:center;gap:8px;margin-top:4px;font-size:11px;font-weight:600;padding:3px 7px;border-radius:5px;background:rgba(0,0,0,.03);border:1px solid rgba(0,0,0,.05);}
+.qv-addresses .qv-adr-com{display:inline-flex;align-items:center;gap:3px;color:var(--text2);}
+.qv-addresses .qv-adr-res{display:inline-flex;align-items:center;gap:3px;color:var(--text2);}
+.qv-addresses .qv-adr-pct{margin-left:auto;font-size:9px;font-weight:700;padding:1px 6px;border-radius:99px;background:var(--surface2);color:var(--text3);}
+.qv-addresses.high-com{background:rgba(230,81,0,.12);border-color:rgba(230,81,0,.35);}
+.qv-addresses.high-com .qv-adr-com{color:#e65100;font-weight:700;}
+.qv-addresses.high-com .qv-adr-pct{background:#e65100;color:#fff;animation:flashPNR 2s infinite;}
+.qv-addresses.medium-com{background:rgba(255,193,7,.12);border-color:rgba(255,193,7,.35);}
+.qv-addresses.medium-com .qv-adr-com{color:#e65100;font-weight:700;}
+.qv-addresses.medium-com .qv-adr-pct{background:#ff9800;color:#fff;}
+[data-theme="dark"] .qv-addresses{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08);}
+[data-theme="dark"] .qv-addresses.high-com{background:rgba(230,81,0,.18);}
+[data-theme="dark"] .qv-addresses.medium-com{background:rgba(255,193,7,.15);}
 /* Card destacado quando há PNR ativa */
 .qv-card.has-pnr{border:2px solid #c2185b!important;box-shadow:0 0 0 2px rgba(194,24,91,.2);animation:pulsePNR 1.8s infinite;}
 @keyframes pulsePNR{0%,100%{box-shadow:0 0 0 2px rgba(194,24,91,.2);}50%{box-shadow:0 0 0 5px rgba(194,24,91,.45);}}
@@ -262,6 +276,10 @@ textarea#rawInput:focus{outline:2px solid var(--blue-mid);border-color:transpare
 .qv-card.has-ambu{border:2px solid #6a1b9a!important;box-shadow:0 0 0 2px rgba(106,27,154,.18);animation:pulseAmbu 1.8s infinite;}
 @keyframes pulseAmbu{0%,100%{box-shadow:0 0 0 2px rgba(106,27,154,.18);}50%{box-shadow:0 0 0 6px rgba(106,27,154,.4);}}
 .qv-badges .badge-ambu{background:linear-gradient(135deg,#6a1b9a,#4a148c);color:#fff;font-weight:700;animation:flashPNR 1.2s infinite;padding:3px 8px;}
+/* Card com Sleepover (Retorno pausado) — destaque em laranja */
+.qv-card.has-sleepover{border:2px solid #e65100!important;box-shadow:0 0 0 2px rgba(230,81,0,.18);animation:pulseSleepover 2s infinite;}
+@keyframes pulseSleepover{0%,100%{box-shadow:0 0 0 2px rgba(230,81,0,.18);}50%{box-shadow:0 0 0 6px rgba(230,81,0,.38);}}
+.qv-badges .badge-sleepover{background:linear-gradient(135deg,#e65100,#bf360c);color:#fff;font-weight:700;padding:3px 8px;letter-spacing:.03em;font-size:9px;animation:flashPNR 1.5s infinite;}
 /* Tag de tipo de rota — só usada para SACA em trânsito (cards com motorista ficam limpos) */
 .qv-route-kind{display:inline-block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:2px 6px;border-radius:4px;margin-bottom:3px;}
 .kind-saca{background:#fff3e0;color:#e65100;border:1px solid #ffb74d;}
@@ -282,19 +300,39 @@ textarea#rawInput:focus{outline:2px solid var(--blue-mid);border-color:transpare
 .pnr-badge{display:inline-flex;align-items:center;gap:4px;background:#fce4ec;color:#c2185b;border:1px solid #f48fb1;border-radius:5px;padding:2px 8px;font-size:11px;font-weight:700;animation:flashPNR 1.2s infinite;}
 @keyframes flashPNR{0%,100%{opacity:1}50%{opacity:.5}}
 
-/* ── PAUSED ── */
-.paused-section{background:var(--surface);border-radius:var(--radius);border:2px solid #fb8c00;padding:14px;margin-bottom:13px;}
-.paused-section h3{font-size:13px;font-weight:600;color:var(--amber-mid);margin-bottom:9px;}
-.paused-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px;}
-.paused-card{background:#fff8e1;border:1px solid #ffcc80;border-radius:var(--radius-sm);padding:10px 12px;}
-.paused-card .pc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
-.paused-card .pc-name{font-size:12px;font-weight:700;}
-.paused-deadline{background:#e65100;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;display:flex;align-items:center;gap:3px;animation:flashDeadline 2s infinite;}
-@keyframes flashDeadline{0%,100%{opacity:1}50%{opacity:.6}}
-.paused-card .pc-info{font-size:11px;color:var(--text2);line-height:1.6;}
-.paused-card .pc-pkg{font-size:11px;font-weight:600;color:var(--amber);}
-.paused-add-btn{font-size:11px;padding:5px 12px;border-radius:var(--radius-sm);border:1px dashed #fb8c00;background:var(--surface);color:var(--amber-mid);cursor:pointer;margin-top:8px;}
+/* ── PAUSED — Sleepover (Retorno Pausado) ── */
+.paused-section{background:linear-gradient(135deg,rgba(255,143,0,.07),rgba(230,81,0,.04));border-radius:var(--radius);border:2px solid #fb8c00;padding:16px 18px;margin-bottom:13px;position:relative;overflow:hidden;}
+.paused-section.has-paused{box-shadow:0 0 0 3px rgba(251,140,0,.18);animation:pulsePaused 3s infinite;}
+@keyframes pulsePaused{0%,100%{box-shadow:0 0 0 3px rgba(251,140,0,.18);}50%{box-shadow:0 0 0 7px rgba(251,140,0,.32);}}
+.paused-section h3{font-size:14px;font-weight:700;color:#e65100;margin-bottom:11px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.paused-count-badge{background:#e65100;color:#fff;font-size:11px;font-weight:700;padding:3px 11px;border-radius:99px;display:inline-flex;align-items:center;gap:4px;}
+.paused-deadline-info{font-size:11px;color:var(--amber);font-weight:600;background:#fff3e0;padding:4px 10px;border-radius:99px;border:1px solid #ffcc80;display:inline-flex;align-items:center;gap:5px;}
+.paused-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:10px;}
+.paused-card{background:#fff;border:2px solid #ffcc80;border-radius:var(--radius-sm);padding:11px 13px;position:relative;transition:transform .15s,box-shadow .15s;}
+.paused-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(230,81,0,.15);}
+.paused-card.auto-detected{border-left:4px solid #e65100;background:linear-gradient(135deg,#fff8e1,#fff);}
+.paused-card.manual{border-left:4px solid #1565c0;}
+.paused-card .pc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;gap:6px;}
+.paused-card .pc-name{font-size:13px;font-weight:700;color:#1a237e;display:flex;align-items:center;gap:5px;}
+.paused-card .pc-source-badge{font-size:8px;font-weight:700;padding:2px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:.04em;}
+.paused-card.auto-detected .pc-source-badge{background:#e65100;color:#fff;}
+.paused-card.manual .pc-source-badge{background:#1565c0;color:#fff;}
+.paused-deadline{background:linear-gradient(135deg,#e65100,#bf360c);color:#fff;font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px;display:inline-flex;align-items:center;gap:3px;animation:flashDeadline 2s infinite;white-space:nowrap;}
+@keyframes flashDeadline{0%,100%{opacity:1}50%{opacity:.55}}
+.paused-card .pc-driver{font-size:12px;color:#c2185b;font-weight:600;margin-bottom:4px;}
+.paused-card .pc-info{font-size:11px;color:var(--text2);line-height:1.65;}
+.paused-card .pc-info-row{display:flex;align-items:center;gap:5px;}
+.paused-card .pc-info-row strong{color:var(--text);min-width:60px;}
+.paused-card .pc-pkg{font-size:11px;font-weight:700;color:var(--red);background:var(--red-bg);padding:1px 7px;border-radius:99px;}
+.paused-card .pc-fail-count{color:var(--red);font-weight:700;}
+.paused-card .pc-route-id{font-size:10px;color:var(--blue-mid);font-family:'Consolas',monospace;}
+.paused-add-btn{font-size:11px;padding:6px 13px;border-radius:var(--radius-sm);border:1px dashed #fb8c00;background:var(--surface);color:var(--amber-mid);cursor:pointer;margin-top:10px;font-weight:600;}
 .paused-add-btn:hover{background:#fff3e0;}
+.paused-empty{color:var(--text3);font-size:12px;padding:8px 0;font-style:italic;}
+[data-theme="dark"] .paused-card{background:rgba(255,143,0,.08);border-color:rgba(255,143,0,.45);}
+[data-theme="dark"] .paused-card.auto-detected{background:linear-gradient(135deg,rgba(255,143,0,.12),rgba(255,143,0,.06));}
+[data-theme="dark"] .paused-card .pc-name{color:#82b1ff;}
+[data-theme="dark"] .paused-deadline-info{background:rgba(255,152,0,.18);color:#ffb74d;}
 
 /* ── CHARTS ── */
 .charts-grid{display:grid;grid-template-columns:2fr 1fr;gap:11px;margin-bottom:12px;}
@@ -864,11 +902,17 @@ tr.total-row td{border-top:2px solid #90a4ae;font-size:11px;color:var(--blue);}
   <div class="alerts-grid" id="alertsGrid"></div>
 </div>
 
-<!-- ROTAS PAUSADAS -->
+<!-- ROTAS PAUSADAS — Sleepover (auto-detectado via "Retorno pausado" + manual) -->
 <div class="paused-section" id="pausedSection" style="display:none">
-  <h3>⏸ Rotas pausadas — entrega no Service Center</h3>
+  <h3>
+    <span>⏸ Rotas Pausadas (Sleepover) — Entrega no Service Center</span>
+    <span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+      <span class="paused-count-badge" id="pausedCountBadge" style="display:none">0 rotas</span>
+      <span class="paused-deadline-info">🕙 Devolução até 10:00h do próximo dia</span>
+    </span>
+  </h3>
   <div class="paused-grid" id="pausedGrid"></div>
-  <button class="paused-add-btn" onclick="openPausedModal()">+ Adicionar rota pausada</button>
+  <button class="paused-add-btn" onclick="openPausedModal()">+ Adicionar manualmente</button>
 </div>
 
 <!-- CHARTS ROW 1 -->
@@ -945,6 +989,7 @@ tr.total-row td{border-top:2px solid #90a4ae;font-size:11px;color:var(--blue);}
         <button class="filter-btn" data-flag="mista" onclick="toggleFlagFilter('mista',this)">🔀 Mista</button>
         <button class="filter-btn" data-flag="pnr" onclick="toggleFlagFilter('pnr',this)">⚡ PNR</button>
         <button class="filter-btn" data-flag="ambu" onclick="toggleFlagFilter('ambu',this)">🚑 Ambulância</button>
+        <button class="filter-btn" data-flag="sleepover" onclick="toggleFlagFilter('sleepover',this)">⏸ Sleepover</button>
         <button class="filter-btn" data-flag="foraArea" onclick="toggleFlagFilter('foraArea',this)">📍 Fora área</button>
       </div>
       <div class="filter-group">
@@ -1492,6 +1537,13 @@ function parseText(raw){
     const mist = block.match(/(\d+)\s+de\s+entrega[\s\S]{0,5}(\d+)\s+de\s+coleta/i);
     if(mist){ sprEntrega=+mist[1]; sprColeta=+mist[2]; }
 
+    // Endereços comerciais vs residenciais — orienta priorização (comercio fecha mais cedo)
+    // Padrões aceitos: "X paradas comerciais", "X comerciais", "X comerciais — Y residenciais", etc
+    const comerM = block.match(/(\d+)\s+(?:paradas?\s+)?comerciais?/i);
+    const residM = block.match(/(\d+)\s+(?:paradas?\s+)?residenciais?/i);
+    const comercial   = comerM ? +comerM[1] : 0;
+    const residencial = residM ? +residM[1] : 0;
+
     let spr = pend+fail+ok;
     if(spr===0){ const u=block.match(/(\d+)\s+unidades?/i); if(u) spr=+u[1]; }
     if(spr===0 && (sprEntrega+sprColeta)>0) spr=sprEntrega+sprColeta;
@@ -1585,6 +1637,7 @@ function parseText(raw){
       tipoVeiculo, isExtra,
       isMista: (sprEntrega+sprColeta)>0,
       sprEntrega, sprColeta,
+      comercial, residencial,
       routeKind, hasDriver,
     });
     // Debug — remover após confirmar
@@ -1627,6 +1680,7 @@ function updateAll(){
   updateKPIs();renderQuickView();updateAlerts();
   populateNexDropdown();
   renderTable();renderCharts();renderFalhasResume();
+  renderPausedSection(); // re-detecta sleepovers (Retorno pausado) a cada import
   renderOverviewCard();
   renderReportCard();
 }
@@ -2091,15 +2145,32 @@ function renderQuickView(){
     if(d.atrasada)badges.push(`<span class="badge badge-red">Atrasada</span>`);
     if(ex.pnr)badges.push(`<span class="badge badge-pink-pnr">⚡ PNR ATIVA</span>`);
     if(d.ambu)badges.push(`<span class="badge badge-ambu">🚑 ${d.ambuCount||1} ambul.</span>`);
+    if(d.status==='Retorno pausado')badges.push(`<span class="badge badge-sleepover">⏸ SLEEPOVER · 10h SC</span>`);
     if(d.fail>0)badges.push(`<span class="badge badge-red">${d.fail} falha(s)</span>`);
     if(d.status==='Concluída')badges.push(`<span class="badge badge-blue">✓</span>`);
-    const pnrClass  = ex.pnr ? ' has-pnr' : '';
-    const ambuClass = d.ambu ? ' has-ambu' : '';
+    const pnrClass   = ex.pnr ? ' has-pnr' : '';
+    const ambuClass  = d.ambu ? ' has-ambu' : '';
+    const sleepClass = d.status === 'Retorno pausado' ? ' has-sleepover' : '';
     // Tag só aparece em sacas em trânsito (cards sem motorista, a caminho do NEx/DC)
     // Cards com motorista (gaiola mãe / nex local) ficam limpos — motorista é o padrão
     let kindTag = '';
     if (d.routeKind === 'saca') kindTag = '<span class="qv-route-kind kind-saca">🛍 Saca em trânsito</span>';
-    return `<div class="qv-card${pnrClass}${ambuClass}" style="background:${bg};border-color:${bc}">
+    // Bloco de endereços comerciais/residenciais — destaca rotas que precisam priorizar comércio
+    let addressesHtml = '';
+    const totalAdr = (d.comercial||0) + (d.residencial||0);
+    if (totalAdr > 0) {
+      const comerPct = (d.comercial / totalAdr * 100);
+      let advClass = '';
+      if (comerPct >= 40 || d.comercial >= 15) advClass = ' high-com';
+      else if (comerPct >= 20 || d.comercial >= 8) advClass = ' medium-com';
+      const titleCom = advClass === ' high-com' ? '⚠ Priorize comerciais (fecham mais cedo)' : 'Endereços comerciais';
+      addressesHtml = `<div class="qv-addresses${advClass}" title="${titleCom}">
+        <span class="qv-adr-com">🏢 <strong>${d.comercial}</strong> com</span>
+        <span class="qv-adr-res">🏠 <strong>${d.residencial}</strong> res</span>
+        <span class="qv-adr-pct">${comerPct.toFixed(0)}% com</span>
+      </div>`;
+    }
+    return `<div class="qv-card${pnrClass}${ambuClass}${sleepClass}" style="background:${bg};border-color:${bc}">
       ${kindTag}
       <div class="qv-name">${d.nome}</div>
       <div class="qv-rota">${d.rota} · ${d.ok}/${d.spr}${d.nexAgencia ? ' · '+d.nexAgencia : ''}</div>
@@ -2108,6 +2179,7 @@ function renderQuickView(){
         <span class="qv-pct" style="color:${pc}">${p}%</span>
       </div>
       ${(()=>{const v=pkgPorHora(d);return v?`<div style="font-size:10px;font-weight:700;color:${pkgPorHoraColor(v)};margin-top:3px">⚡ ${v} pkg/h</div>`:''})()}
+      ${addressesHtml}
       <div class="qv-badges">${badges.join('')||'<span style="font-size:10px;color:var(--text3)">sem alertas</span>'}</div>
     </div>`;
   }).join('');
@@ -2145,11 +2217,12 @@ const QUICK_FILTERS = {
   andamento:d => d.status === 'Em andamento',
 };
 const FLAG_FILTERS = {
-  atrasada: d => d.atrasada,
-  mista:    d => d.isMista,
-  pnr:      d => extras[d.rota] && extras[d.rota].pnr,
-  ambu:     d => d.ambu,
-  foraArea: d => d.foraArea > 0,
+  atrasada:  d => d.atrasada,
+  mista:     d => d.isMista,
+  pnr:       d => extras[d.rota] && extras[d.rota].pnr,
+  ambu:      d => d.ambu,
+  sleepover: d => d.status === 'Retorno pausado',
+  foraArea:  d => d.foraArea > 0,
 };
 
 function toggleQuickFilter(f, btn) {
@@ -2274,6 +2347,7 @@ function renderTable(){
     if(d.fechando)alBadges.push(`<span class="badge badge-amber">Fecha breve</span>`);
     if(d.foraArea>0)alBadges.push(`<span class="badge badge-red">${d.foraArea}x fora área</span>`);
     if(d.ambu)alBadges.push(`<span class="badge badge-ambu">🚑 ${d.ambuCount||1} ambul.</span>`);
+    if(d.status==='Retorno pausado')alBadges.push(`<span class="badge badge-sleepover">⏸ SLEEPOVER</span>`);
     if(ex.pnr)alBadges.push(`<span class="badge badge-pink" style="animation:flashPNR 1.2s infinite">⚡ PNR</span>`);
     const motivosHtml=(ex.motivos&&ex.motivos.length)?ex.motivos.map(m=>`<span class="badge badge-red" style="font-size:9px">${m}</span>`).join(''):'';
     const obsHtml=ex.obs?`<div class="obs-inline">${ex.obs}</div>`:'';
@@ -2353,19 +2427,82 @@ function saveModal(){
 // PAUSED ROUTES
 // ═══════════════════════════════════════════════════
 function renderPausedSection(){
-  const grid=document.getElementById('pausedGrid');
-  if(!pausedRoutes.length){grid.innerHTML='<div style="color:var(--text3);font-size:12px;padding:4px">Nenhuma rota pausada.</div>';return;}
-  grid.innerHTML=pausedRoutes.map(r=>`
-    <div class="paused-card">
-      <div class="pc-header"><span class="pc-name">⏸ ${r.rota}</span><span class="paused-deadline">🕙 10:00h — Service Center</span></div>
-      <div class="pc-info">
-        <div><strong>Motivo:</strong> ${r.motivo}</div>
-        <div><strong>Pacotes:</strong> <span class="pc-pkg">${r.pkgs||'—'}</span></div>
-        ${r.obs?`<div style="margin-top:3px;font-style:italic">${r.obs}</div>`:''}
-        <div style="margin-top:4px;font-size:10px;color:var(--text3)">Registrado às ${r.time}</div>
-      </div>
-      <button class="btn-secondary" onclick="removePaused('${r._id}')" style="font-size:10px;padding:2px 8px;margin-top:5px;color:var(--red);border-color:var(--red)">Remover</button>
-    </div>`).join('');
+  const grid    = document.getElementById('pausedGrid');
+  const section = document.getElementById('pausedSection');
+  const badge   = document.getElementById('pausedCountBadge');
+  if (!grid || !section) return;
+
+  // [1] Auto-detectadas — drivers com status "Retorno pausado" do import
+  const autoDetected = (drivers || []).filter(d => d.status === 'Retorno pausado').map(d => ({
+    source:  'auto',
+    rota:    d.rota,
+    nome:    d.nome || 'sem motorista',
+    id:      d.id || '',
+    pend:    d.pend || 0,
+    fail:    d.fail || 0,
+    ok:      d.ok || 0,
+    ambuCount: d.ambuCount || 0,
+    foraArea: d.foraArea || 0,
+  }));
+  // [2] Manuais — registradas via Adicionar Rota Pausada
+  const manuais = (pausedRoutes || []).map(r => ({ ...r, source: 'manual' }));
+
+  const total = autoDetected.length + manuais.length;
+
+  // Atualiza badge contador e classe pulsante
+  if (badge) {
+    if (total > 0) {
+      badge.style.display = '';
+      const autoTxt   = autoDetected.length ? `${autoDetected.length} auto` : '';
+      const manualTxt = manuais.length ? `${manuais.length} manual` : '';
+      const parts = [autoTxt, manualTxt].filter(Boolean).join(' · ');
+      badge.textContent = `${total} rota${total!==1?'s':''}${parts ? ' (' + parts + ')' : ''}`;
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+  section.classList.toggle('has-paused', total > 0);
+
+  if (!total) {
+    grid.innerHTML = '<div class="paused-empty">✅ Nenhuma rota pausada no momento. Esta seção é preenchida automaticamente quando o sistema identifica "Retorno pausado" no import dos dados.</div>';
+    return;
+  }
+
+  // Render: auto-detectadas primeiro (mais críticas), depois manuais
+  const all = [...autoDetected, ...manuais];
+  grid.innerHTML = all.map(r => {
+    if (r.source === 'auto') {
+      const ambuHtml = r.ambuCount ? `<span class="badge badge-ambu" style="font-size:9px">🚑 ${r.ambuCount} ambul.</span>` : '';
+      const faHtml   = r.foraArea > 0 ? `<span class="badge badge-red" style="font-size:9px">${r.foraArea}x fora área</span>` : '';
+      return `<div class="paused-card auto-detected">
+        <div class="pc-header">
+          <span class="pc-name">⏸ ${r.rota} <span class="pc-source-badge">🤖 Auto</span></span>
+          <span class="paused-deadline">🕙 10:00h</span>
+        </div>
+        <div class="pc-driver">👤 ${r.nome}</div>
+        <div class="pc-info">
+          <div class="pc-info-row"><strong>Pacotes:</strong> <span class="pc-pkg">${r.pend + r.fail} pend/fail</span></div>
+          <div class="pc-info-row"><strong>Detalhes:</strong> ${r.pend} pend, <span class="pc-fail-count">${r.fail} fail</span>, ${r.ok} ok</div>
+          ${r.id ? `<div class="pc-info-row"><strong>ID:</strong> <span class="pc-route-id">#${r.id}</span></div>` : ''}
+          ${(ambuHtml || faHtml) ? `<div style="margin-top:4px;display:flex;gap:3px;flex-wrap:wrap">${ambuHtml}${faHtml}</div>` : ''}
+        </div>
+      </div>`;
+    } else {
+      return `<div class="paused-card manual">
+        <div class="pc-header">
+          <span class="pc-name">⏸ ${r.rota} <span class="pc-source-badge">✋ Manual</span></span>
+          <span class="paused-deadline">🕙 10:00h</span>
+        </div>
+        <div class="pc-info">
+          <div class="pc-info-row"><strong>Motivo:</strong> ${r.motivo || '—'}</div>
+          <div class="pc-info-row"><strong>Pacotes:</strong> <span class="pc-pkg">${r.pkgs||'—'}</span></div>
+          ${r.obs ? `<div style="margin-top:3px;font-style:italic;color:var(--text3)">${r.obs}</div>` : ''}
+          <div style="margin-top:4px;font-size:10px;color:var(--text3)">Registrado às ${r.time||''}</div>
+        </div>
+        <button class="btn-secondary" onclick="removePaused('${r._id}')" style="font-size:10px;padding:2px 8px;margin-top:6px;color:var(--red);border-color:var(--red)">Remover</button>
+      </div>`;
+    }
+  }).join('');
 }
 function openPausedModal(){document.getElementById('pm-rota').value='';document.getElementById('pm-pkgs').value='';document.getElementById('pm-obs').value='';document.getElementById('pausedModalOverlay').style.display='flex';}
 function closePausedModal(){document.getElementById('pausedModalOverlay').style.display='none';}
