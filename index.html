@@ -208,6 +208,23 @@ textarea#rawInput:focus{outline:2px solid var(--blue-mid);border-color:transpare
 .ov-empty-offenders{color:var(--text3);font-style:italic;font-size:11px;}
 [data-theme="dark"] .ov-offenders{background:rgba(239,83,80,.08);}
 [data-theme="dark"] .ov-offenders li strong{color:#82b1ff;}
+/* Estado vazio (no-data) do Overview e Report — mostra estrutura "esperando dados" */
+.overview-card.no-data,.report-card.no-data{opacity:.55;border-style:dashed;background:var(--surface2);}
+.overview-card.no-data::before,.report-card.no-data::before{
+  content:'⏳ Importe os dados desta operação para preencher este card';
+  display:block;
+  background:linear-gradient(135deg,#fff3e0,#ffe0b2);
+  color:#e65100;
+  border:1px dashed #ff9800;
+  border-radius:var(--radius-sm);
+  padding:10px 14px;
+  font-size:12px;
+  font-weight:600;
+  margin-bottom:14px;
+  text-align:center;
+}
+[data-theme="dark"] .overview-card.no-data::before,
+[data-theme="dark"] .report-card.no-data::before{background:rgba(230,81,0,.15);color:#ffb74d;}
 /* Resumo da operação (manual) */
 .ov-resumo{margin-top:14px;background:var(--surface2);border-radius:var(--radius-sm);padding:12px 14px;border-left:3px solid var(--blue-mid);}
 .ov-resumo h3{font-size:11px;font-weight:700;color:var(--blue);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;}
@@ -1797,12 +1814,34 @@ const OP_CITIES = {
 function renderOverviewCard() {
   const card = document.getElementById('overviewCard');
   if (!card) return;
-  // Só aparece em modo operação normal (não Geral/Histórico) e com dados
-  if (currentOperation === 'GERAL' || currentOperation === 'HISTORICO' || !drivers || !drivers.length) {
+  // Em GERAL/HISTORICO: esconde (não faz sentido lá)
+  if (currentOperation === 'GERAL' || currentOperation === 'HISTORICO') {
     card.style.display = 'none';
     return;
   }
+  // SEMPRE visível em abas normais — operadores precisam ver que o card existe
+  // Mesmo sem dados, mostra estrutura vazia com placeholder
   card.style.display = '';
+  // Se não tem dados, marca classe pra estilo "esperando" e zera campos
+  if (!drivers || !drivers.length) {
+    card.classList.add('no-data');
+    const set = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
+    const cidade = OP_CITIES[currentOperation] || '';
+    set('ovOpName', currentOperation + (cidade ? ' · ' + cidade : ''));
+    set('ovDate', '📅 ' + new Date().toLocaleDateString('pt-BR'));
+    set('ov-pacotes', '—');
+    set('ov-sacas', '—');
+    set('ov-pend', '—');
+    set('ov-fail', '—');
+    set('ov-ok', '—');
+    set('ov-ds', '🚀 DS Geral: —');
+    set('ov-fail-pct', '🔴 Insucessos: —');
+    set('ov-conc', '🟢 Rotas finalizadas: —');
+    const ul = document.getElementById('ovOffenders');
+    if (ul) ul.innerHTML = '<li class="ov-empty-offenders">⏳ Aguardando importação de dados na aba ' + currentOperation + '...</li>';
+    return;
+  }
+  card.classList.remove('no-data');
 
   const totalSpr  = drivers.reduce((s,d)=>s+(d.spr||0),0);
   const totalOk   = drivers.reduce((s,d)=>s+(d.ok||0),0);
@@ -1996,12 +2035,23 @@ function loadReportField(field, fallback) {
 function renderReportCard() {
   const card = document.getElementById('reportCard');
   if (!card) return;
-  // Só aparece em operação normal e com dados importados
-  if (currentOperation === 'GERAL' || currentOperation === 'HISTORICO' || !drivers || !drivers.length) {
+  // Em GERAL/HISTORICO: esconde
+  if (currentOperation === 'GERAL' || currentOperation === 'HISTORICO') {
     card.style.display = 'none';
     return;
   }
+  // SEMPRE visível em abas normais (placeholder vazio quando sem dados)
   card.style.display = '';
+  if (!drivers || !drivers.length) {
+    card.classList.add('no-data');
+    const cidade = OP_CITIES[currentOperation] || '';
+    const opNameEl = document.getElementById('rpOpName');
+    if (opNameEl) opNameEl.textContent = '· ' + currentOperation + (cidade ? ' · ' + cidade : '');
+    const opInput = document.getElementById('rp-operacao');
+    if (opInput) opInput.value = currentOperation + (cidade ? ' · ' + cidade : '');
+    return;
+  }
+  card.classList.remove('no-data');
 
   const cidade = OP_CITIES[currentOperation] || '';
   const opNameEl = document.getElementById('rpOpName');
