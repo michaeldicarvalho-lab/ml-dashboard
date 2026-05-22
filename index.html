@@ -208,6 +208,14 @@ textarea#rawInput:focus{outline:2px solid var(--blue-mid);border-color:transpare
 .ov-empty-offenders{color:var(--text3);font-style:italic;font-size:11px;}
 [data-theme="dark"] .ov-offenders{background:rgba(239,83,80,.08);}
 [data-theme="dark"] .ov-offenders li strong{color:#82b1ff;}
+/* Resumo da operação (manual) */
+.ov-resumo{margin-top:14px;background:var(--surface2);border-radius:var(--radius-sm);padding:12px 14px;border-left:3px solid var(--blue-mid);}
+.ov-resumo h3{font-size:11px;font-weight:700;color:var(--blue);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;}
+.ov-resumo textarea{width:100%;min-height:70px;background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 11px;font-size:12.5px;font-family:inherit;color:var(--text);resize:vertical;line-height:1.5;outline:none;transition:border-color .15s;}
+.ov-resumo textarea:focus{border-color:var(--blue-mid);box-shadow:0 0 0 2px rgba(21,101,192,.12);}
+.ov-resumo textarea:placeholder-shown{font-style:italic;color:var(--text3);}
+[data-theme="dark"] .ov-resumo textarea{background:var(--surface);color:var(--text);}
+[data-theme="dark"] .ov-resumo{background:rgba(21,101,192,.08);}
 
 /* ── REPORT REGIONAL — card de relatório pós-operação para grupo da regional ── */
 .report-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 22px;margin-bottom:13px;position:relative;box-shadow:0 1px 3px rgba(0,0,0,.04);}
@@ -509,6 +517,9 @@ tr.total-row td{border-top:2px solid #90a4ae;font-size:11px;color:var(--blue);}
 [data-theme="dark"] .ovx-card .ovx-offenders li strong{color:#82b1ff;}
 [data-theme="dark"] .ovx-card .ovx-offenders li .ovx-name{color:#ff80ab;}
 .ovx-empty{padding:24px;text-align:center;color:var(--text3);font-size:12px;background:var(--surface2);border-radius:var(--radius);}
+.ovx-card .ovx-resumo{margin-top:8px;padding:7px 10px;background:rgba(21,101,192,.08);border-left:3px solid var(--blue-mid);border-radius:var(--radius-sm);font-size:11px;line-height:1.5;color:var(--text);font-style:italic;}
+.ovx-card .ovx-resumo strong{color:var(--blue);font-style:normal;}
+[data-theme="dark"] .ovx-card .ovx-resumo{background:rgba(66,165,245,.12);}
 /* Aba HISTÓRICO — também oculta por padrão (compartilha unlock do supervisor) */
 .ops-tab.history-tab{background:linear-gradient(135deg,rgba(156,39,176,.2),rgba(123,31,162,.15));border:1px solid rgba(156,39,176,.4);display:none;}
 .ops-tab.history-tab.unlocked{display:flex;align-items:center;}
@@ -1063,6 +1074,12 @@ tr.total-row td{border-top:2px solid #90a4ae;font-size:11px;color:var(--blue);}
   <div class="ov-offenders">
     <h3>🔥 Rotas mais ofensoras</h3>
     <ul id="ovOffenders"><li class="ov-empty-offenders">— sem dados ainda —</li></ul>
+  </div>
+  <div class="ov-resumo">
+    <h3>📝 Resumo da Operação</h3>
+    <textarea id="ovResumo"
+      placeholder="Escreva um breve resumo do dia: como foi a operação, principais ocorrências, ajustes feitos, motivos de insucessos relevantes..."
+      oninput="saveOvResumo()"></textarea>
   </div>
 </div>
 
@@ -1764,6 +1781,12 @@ function renderOverviewCard() {
     opInput.value = localStorage.getItem('ov_operator_name') || '';
   }
 
+  // Restaurar resumo manual da operação (por op + data)
+  const resumoEl = document.getElementById('ovResumo');
+  if (resumoEl && !resumoEl.value) {
+    resumoEl.value = loadOvResumo();
+  }
+
   // Exibir horários de abertura/fechamento do turno
   const times = getOvTimes();
   const timesEl = document.getElementById('ovTimes');
@@ -1784,6 +1807,19 @@ function saveOvOperator() {
   const v = document.getElementById('ovOperator').value.trim();
   if (v) localStorage.setItem('ov_operator_name', v);
   else localStorage.removeItem('ov_operator_name');
+}
+
+// Salva o resumo manual da operação (por op + data)
+function saveOvResumo() {
+  const v = (document.getElementById('ovResumo').value || '').trim();
+  const today = new Date().toISOString().slice(0,10);
+  const k = `ov_resumo_${currentOperation}_${today}`;
+  if (v) localStorage.setItem(k, v);
+  else localStorage.removeItem(k);
+}
+function loadOvResumo() {
+  const today = new Date().toISOString().slice(0,10);
+  return localStorage.getItem(`ov_resumo_${currentOperation}_${today}`) || '';
 }
 
 // Registra horário do import — 1º import = abertura (travado), demais = fechamento (atualizado).
@@ -2106,6 +2142,12 @@ function copyOvText() {
       const driverName = (d.nome && d.nome !== d.rota) ? d.nome : 'sem motorista';
       txt += `${d.rota || '—'} · ${driverName} · ${d.id ? '#'+d.id : 'sem ID'} — ${d.fail} insucesso${d.fail!==1?'s':''}\n`;
     });
+  }
+
+  // Resumo manual da operação (se preenchido)
+  const resumo = (document.getElementById('ovResumo')?.value || '').trim();
+  if (resumo) {
+    txt += `\n*📝 RESUMO:*\n${resumo}\n`;
   }
 
   navigator.clipboard.writeText(txt).then(() => {
@@ -3152,6 +3194,7 @@ function renderOverviewMiniCard(turno) {
         <div class="ovx-offenders-title">🔥 Top ofensores</div>
         <ul>${offendersHtml}</ul>
       </div>
+      ${ov.resumo ? `<div class="ovx-resumo"><strong>📝 Resumo:</strong> ${ov.resumo}</div>` : ''}
     </div>
   `;
 }
@@ -3458,7 +3501,7 @@ function exportHistoricoCSV() {
   const headers = [
     'Data','Ciclo','Operacao','Cidade','Operador',
     'Total_Rotas','Total_SPR','OK','Pendentes','Falhas','DS_pct','Concluidas',
-    'Abertura','Fechamento',
+    'Abertura','Fechamento','Resumo_Operacao',
     'Scheduling','Ofertados','Carregados','NS','Extras_D0','Obs',
     'Top_Ofensoras','Timestamp'
   ];
@@ -3481,6 +3524,7 @@ function exportHistoricoCSV() {
       fmt(t.concluidas),
       ov.aberturaHora || '',
       ov.fechamentoHora || '',
+      (ov.resumo || '').replace(/[\r\n]+/g, ' '),
       fmt(rp.scheduling), fmt(rp.ofertados), fmt(rp.carregados),
       fmt(rp.ns), fmt(rp.extras), (rp.obs || '').replace(/[\r\n]+/g, ' '),
       topStr,
@@ -3629,7 +3673,7 @@ async function wipeAllData() {
     // Apagar nome do operador, horários de turno e dados de report salvos localmente
     localStorage.removeItem('ov_operator_name');
     Object.keys(localStorage)
-      .filter(k => k.startsWith('ov_open_') || k.startsWith('ov_close_') || k.startsWith('rp_'))
+      .filter(k => k.startsWith('ov_open_') || k.startsWith('ov_close_') || k.startsWith('ov_resumo_') || k.startsWith('rp_'))
       .forEach(k => localStorage.removeItem(k));
     const ovInput = document.getElementById('ovOperator');
     if (ovInput) ovInput.value = '';
@@ -3907,6 +3951,7 @@ async function confirmarFechamento() {
         aberturaHora: ovTimes.open || '',
         fechamentoHora: ovTimes.close || '',
         topOffenders,
+        resumo: (document.getElementById('ovResumo')?.value || '').trim(),
         sacas: 0, // pode ser ajustado quando capturarmos sacas
       },
       // Snapshot do Report Regional (operação D-1 vs D0)
