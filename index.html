@@ -468,22 +468,27 @@ tr.total-row td{border-top:2px solid #90a4ae;font-size:11px;color:var(--blue);}
   .ov-stat-val{font-size:20px;}
 }
 
-/* ── FLOATING ACTION BUTTON (FAB) — só aparece no mobile ── */
-.fab-container{display:none;}
-@media(max-width:768px){
-  .fab-container{display:flex;flex-direction:column;align-items:flex-end;gap:10px;position:fixed;bottom:18px;right:18px;z-index:8500;}
-  .fab-menu{display:none;flex-direction:column;gap:8px;animation:fabSlideUp .2s ease;}
-  .fab-menu.open{display:flex;}
-  .fab-action{background:#fff;color:#1565c0;border:1px solid #90caf9;border-radius:99px;padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.18);display:flex;align-items:center;gap:8px;white-space:nowrap;}
-  .fab-action.fab-close-turno{background:linear-gradient(135deg,#1b5e20,#2e7d32);color:#fff;border-color:#1b5e20;}
-  .fab-action.fab-report{background:linear-gradient(135deg,#283593,#1565c0);color:#fff;border-color:#283593;}
-  .fab-action.fab-overview{background:linear-gradient(135deg,#e65100,#bf360c);color:#fff;border-color:#e65100;}
-  .fab-action:active{transform:scale(.96);}
-  .fab-main{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#1a237e,#1565c0);color:#fff;border:none;font-size:26px;cursor:pointer;box-shadow:0 6px 20px rgba(26,35,126,.4);display:flex;align-items:center;justify-content:center;transition:transform .2s;}
-  .fab-main.open{transform:rotate(45deg);background:linear-gradient(135deg,#b71c1c,#c62828);}
-  @keyframes fabSlideUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-}
+/* ── FLOATING ACTION BUTTON (FAB) — visível em todos os dispositivos ── */
+.fab-container{display:flex;flex-direction:column;align-items:flex-end;gap:10px;position:fixed;bottom:22px;right:22px;z-index:8500;}
+.fab-menu{display:none;flex-direction:column;gap:8px;animation:fabSlideUp .2s ease;}
+.fab-menu.open{display:flex;}
+.fab-action{background:#fff;color:#1565c0;border:1px solid #90caf9;border-radius:99px;padding:11px 18px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.22);display:flex;align-items:center;gap:8px;white-space:nowrap;transition:transform .12s;}
+.fab-action.fab-close-turno{background:linear-gradient(135deg,#1b5e20,#2e7d32);color:#fff;border-color:#1b5e20;}
+.fab-action.fab-report{background:linear-gradient(135deg,#283593,#1565c0);color:#fff;border-color:#283593;}
+.fab-action.fab-overview{background:linear-gradient(135deg,#e65100,#bf360c);color:#fff;border-color:#e65100;}
+.fab-action:hover{transform:translateX(-3px);box-shadow:0 6px 20px rgba(0,0,0,.28);}
+.fab-action:active{transform:scale(.96);}
+.fab-main{width:62px;height:62px;border-radius:50%;background:linear-gradient(135deg,#1a237e,#1565c0);color:#fff;border:none;font-size:30px;cursor:pointer;box-shadow:0 6px 22px rgba(26,35,126,.45);display:flex;align-items:center;justify-content:center;transition:transform .25s,box-shadow .25s;line-height:1;}
+.fab-main:hover{transform:scale(1.05);box-shadow:0 8px 26px rgba(26,35,126,.55);}
+.fab-main.open{transform:rotate(45deg);background:linear-gradient(135deg,#b71c1c,#c62828);}
+@keyframes fabSlideUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 [data-theme="dark"] .fab-action{background:#222837;color:#82b1ff;border-color:#42a5f5;}
+/* Em mobile o FAB fica um pouco menor para não dominar a tela */
+@media(max-width:480px){
+  .fab-container{bottom:16px;right:16px;}
+  .fab-main{width:56px;height:56px;font-size:26px;}
+  .fab-action{font-size:12px;padding:10px 14px;}
+}
 
 /* ── OPERATION TABS ── */
 .ops-tabs{background:linear-gradient(135deg,#0d1b6e 0%,#1a237e 100%);padding:0 20px;display:flex;align-items:flex-end;gap:4px;overflow-x:auto;}
