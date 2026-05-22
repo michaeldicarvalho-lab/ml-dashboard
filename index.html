@@ -728,8 +728,9 @@ tr.total-row td{border-top:2px solid #90a4ae;font-size:11px;color:var(--blue);}
         <label>Até</label>
         <input type="date" id="histTo">
       </div>
-      <div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="history-load-btn" onclick="loadHistorico()">🔄 Buscar</button>
+        <button class="history-load-btn" onclick="exportHistoricoCSV()" title="Baixar resultado da busca em CSV" style="background:#e1bee7;color:#4a148c">⬇ CSV</button>
       </div>
     </div>
     <div class="history-status" id="histStatus">Defina filtros e clique em Buscar.</div>
@@ -3446,6 +3447,61 @@ async function openHistDetail(op, turnoId) {
 
 function closeHistDetail() {
   document.getElementById('histDetailOverlay').style.display = 'none';
+}
+
+// Exporta o resultado da busca atual do Histórico como CSV
+function exportHistoricoCSV() {
+  if (!historicoData || !historicoData.length) {
+    alert('Sem dados para exportar. Faça uma busca primeiro.');
+    return;
+  }
+  const headers = [
+    'Data','Ciclo','Operacao','Cidade','Operador',
+    'Total_Rotas','Total_SPR','OK','Pendentes','Falhas','DS_pct','Concluidas',
+    'Abertura','Fechamento',
+    'Scheduling','Ofertados','Carregados','NS','Extras_D0','Obs',
+    'Top_Ofensoras','Timestamp'
+  ];
+  const fmt = v => v == null ? '' : String(v);
+  const rows = historicoData.map(t => {
+    const ov = t.overview || {};
+    const rp = t.report || {};
+    const topStr = (ov.topOffenders || []).map(o =>
+      `${o.rota || ''}/${o.nome || ''}/${o.fail || 0}fail`
+    ).join(' | ');
+    return [
+      t.data || '',
+      t.ciclo || '',
+      t.operacao || '',
+      t.cidade || OP_CITIES[t.operacao] || '',
+      t.operador || '',
+      fmt(t.totalRotas), fmt(t.totalSPR), fmt(t.okTotal),
+      fmt(t.pendTotal), fmt(t.failTotal),
+      (t.dsGeral != null ? Number(t.dsGeral).toFixed(2).replace('.', ',') : ''),
+      fmt(t.concluidas),
+      ov.aberturaHora || '',
+      ov.fechamentoHora || '',
+      fmt(rp.scheduling), fmt(rp.ofertados), fmt(rp.carregados),
+      fmt(rp.ns), fmt(rp.extras), (rp.obs || '').replace(/[\r\n]+/g, ' '),
+      topStr,
+      t.timestamp || '',
+    ];
+  });
+  const csv = [headers, ...rows]
+    .map(r => r.map(v => `"${String(v ?? '').replace(/"/g,'""')}"`).join(';'))
+    .join('\r\n');
+  // BOM UTF-8 + separador ; para Excel BR
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  const from = document.getElementById('histFrom').value || 'periodo';
+  const to   = document.getElementById('histTo').value   || '';
+  a.download = `historico_turnos_${from}_a_${to}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  showToast(`💾 CSV baixado: ${historicoData.length} turno${historicoData.length!==1?'s':''}`, '');
 }
 
 // ═══════════════════════════════════════════════════
