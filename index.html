@@ -267,6 +267,37 @@ textarea#rawInput:focus{outline:2px solid var(--blue-mid);border-color:transpare
 .kpi.kpi-blue .k-val{color:var(--blue);}
 .kpi.kpi-purple .k-val{color:var(--purple);}
 
+/* ── PNR STATUS CARD ── */
+.pnr-status-card{background:linear-gradient(135deg,rgba(252,228,236,.5),rgba(255,255,255,.95));border:1px solid #f48fb1;border-radius:var(--radius);padding:14px 18px;margin-bottom:13px;}
+.pnr-status-card h3{font-size:13px;font-weight:700;color:#c2185b;margin-bottom:11px;display:flex;align-items:center;gap:6px;}
+.pnr-status-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:12px;}
+.pnr-mini-kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;text-align:center;transition:transform .15s;}
+.pnr-mini-kpi:hover{transform:translateY(-2px);}
+.pnr-mini-label{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;font-weight:700;margin-bottom:4px;}
+.pnr-mini-val{font-size:26px;font-weight:800;line-height:1;}
+.pnr-mini-open .pnr-mini-val{color:#c2185b;}
+.pnr-mini-open.has-open .pnr-mini-val{animation:flashPNR 1.4s infinite;}
+.pnr-mini-resolved .pnr-mini-val{color:var(--green-mid);}
+.pnr-mini-rate .pnr-mini-val{color:var(--blue);}
+.pnr-mini-rate .pnr-mini-val.high{color:var(--green-mid);}
+.pnr-mini-rate .pnr-mini-val.low{color:var(--amber-mid);}
+.pnr-bars{display:flex;flex-direction:column;gap:7px;padding-top:6px;border-top:1px dashed var(--border);}
+.pnr-bar-row{display:flex;align-items:center;gap:10px;font-size:12px;}
+.pnr-bar-label{min-width:110px;font-weight:600;color:var(--text);}
+.pnr-bar-track{flex:1;height:14px;background:var(--surface2);border-radius:99px;overflow:hidden;border:1px solid var(--border);}
+.pnr-bar-fill{height:100%;border-radius:99px;transition:width .6s ease;}
+.pnr-bar-open{background:linear-gradient(90deg,#c2185b,#ad1457);}
+.pnr-bar-resolved{background:linear-gradient(90deg,#2e7d32,#1b5e20);}
+.pnr-bar-count{min-width:60px;text-align:right;font-weight:700;font-size:11px;color:var(--text2);}
+.pnr-status-empty{padding:14px;text-align:center;color:var(--text3);font-size:12px;font-style:italic;}
+[data-theme="dark"] .pnr-status-card{background:linear-gradient(135deg,rgba(194,24,91,.12),rgba(0,0,0,.2));border-color:rgba(194,24,91,.4);}
+[data-theme="dark"] .pnr-status-card h3{color:#ff80ab;}
+[data-theme="dark"] .pnr-mini-open .pnr-mini-val{color:#ff80ab;}
+
+/* Badge "PNR resolvida" — verde, aparece nas últimas 2h após resolução */
+.qv-card.recently-resolved-pnr{border:2px solid var(--green-mid)!important;}
+.qv-badges .badge-pnr-resolved{background:linear-gradient(135deg,#2e7d32,#1b5e20);color:#fff;font-weight:700;padding:3px 8px;font-size:9px;}
+
 /* ── QUICK VIEW ── */
 .quickview{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:14px;margin-bottom:13px;}
 .quickview h3{font-size:13px;font-weight:600;margin-bottom:10px;}
@@ -962,6 +993,37 @@ tr.total-row td{border-top:2px solid #90a4ae;font-size:11px;color:var(--blue);}
   <div class="kpi kpi-blue"><div class="k-label">Em Andamento</div><div class="k-val" id="k-andamento">—</div><div class="k-sub">rotas ativas</div></div>
   <div class="kpi kpi-green"><div class="k-label">Concluídas</div><div class="k-val" id="k-concluidas">—</div><div class="k-sub">finalizadas</div></div>
   <div class="kpi kpi-purple"><div class="k-label">DS Geral</div><div class="k-val" id="k-ds">—</div><div class="k-sub">% sucesso acumulado</div></div>
+</div>
+
+<!-- PNR STATUS CARD — KPIs (Abertas, Resolvidas, Taxa) + barras horizontais -->
+<div class="pnr-status-card" id="pnrStatusCard" style="display:none">
+  <h3>📞 PNR / Reclamações — Hoje</h3>
+  <div class="pnr-status-grid">
+    <div class="pnr-mini-kpi pnr-mini-open">
+      <div class="pnr-mini-label">⚡ Abertas</div>
+      <div class="pnr-mini-val" id="pnr-abertas">0</div>
+    </div>
+    <div class="pnr-mini-kpi pnr-mini-resolved">
+      <div class="pnr-mini-label">✅ Resolvidas</div>
+      <div class="pnr-mini-val" id="pnr-resolvidas">0</div>
+    </div>
+    <div class="pnr-mini-kpi pnr-mini-rate">
+      <div class="pnr-mini-label">📊 Taxa de resolução</div>
+      <div class="pnr-mini-val" id="pnr-taxa">—</div>
+    </div>
+  </div>
+  <div class="pnr-bars">
+    <div class="pnr-bar-row">
+      <span class="pnr-bar-label">⚡ Abertas</span>
+      <div class="pnr-bar-track"><div class="pnr-bar-fill pnr-bar-open" id="pnr-bar-abertas" style="width:0%"></div></div>
+      <span class="pnr-bar-count" id="pnr-bar-abertas-txt">0 / 0</span>
+    </div>
+    <div class="pnr-bar-row">
+      <span class="pnr-bar-label">✅ Resolvidas</span>
+      <div class="pnr-bar-track"><div class="pnr-bar-fill pnr-bar-resolved" id="pnr-bar-resolvidas" style="width:0%"></div></div>
+      <span class="pnr-bar-count" id="pnr-bar-resolvidas-txt">0 / 0</span>
+    </div>
+  </div>
 </div>
 
 <!-- QUICK VIEW -->
@@ -1692,6 +1754,12 @@ function parseText(raw){
     const ambu   = isAmbuRoute;
     // Se for ambulância ativa, usa contagem de "ocorrências" como nº de apoios; senão 1
     const ambuCount = isAmbuRoute ? (ocorrM ? +ocorrM[1] : 1) : 0;
+
+    // PNR / Reclamação — detecta automaticamente "X reclamação(ões)" no texto do Meli
+    // É a indicação oficial do Meli de que há reclamação aberta na rota
+    const reclamM   = block.match(/(\d+)\s+reclama[çc][aã]o(?:es|ões)?/i);
+    const pnrCount  = reclamM ? +reclamM[1] : 0;
+    const pnrAuto   = pnrCount > 0;
     const foraM    = block.match(/(\d+)\s+fora\s+da\s+[áa]rea/i);
 
     let tipoVeiculo = '';
@@ -1726,7 +1794,7 @@ function parseText(raw){
       ozh:     ozhM  ? ozhM[1]  : '—',
       orhExec: execM ? execM[1] : '—',
       orhPlan: planM ? planM[1] : '—',
-      status, atrasada, fechando, ambu, ambuCount,
+      status, atrasada, fechando, ambu, ambuCount, pnrCount, pnrAuto,
       foraArea: foraM ? +foraM[1] : 0,
       isNex: isNexRoute,
       nexAgencia: agM ? agM[1] : '',
@@ -1779,6 +1847,7 @@ function updateAll(){
   // Cada render isolado em try/catch — se um falhar, não derruba os outros
   // (assim os cards de Overview e Report sempre conseguem renderizar)
   const safe = (label, fn) => { try { fn(); } catch(e) { console.error('[updateAll] ' + label + ':', e); } };
+  safe('syncPnrLog',        syncPnrLog);  // antes dos renders — atualiza log de PNR
   safe('updateKPIs',        updateKPIs);
   safe('renderQuickView',   renderQuickView);
   safe('updateAlerts',      updateAlerts);
@@ -1787,6 +1856,7 @@ function updateAll(){
   safe('renderCharts',      renderCharts);
   safe('renderFalhasResume',renderFalhasResume);
   safe('renderPausedSection', renderPausedSection);
+  safe('renderPnrStatusCard', renderPnrStatusCard);
   safe('renderOverviewCard',  renderOverviewCard);
   safe('renderReportCard',    renderReportCard);
 }
@@ -1931,6 +2001,104 @@ function saveOvResumo() {
 function loadOvResumo() {
   const today = new Date().toISOString().slice(0,10);
   return localStorage.getItem(`ov_resumo_${currentOperation}_${today}`) || '';
+}
+
+// Renderiza o card de status PNR (Abertas, Resolvidas, Taxa + barras)
+function renderPnrStatusCard() {
+  const card = document.getElementById('pnrStatusCard');
+  if (!card) return;
+  if (currentOperation === 'GERAL' || currentOperation === 'HISTORICO') {
+    card.style.display = 'none';
+    return;
+  }
+  card.style.display = '';
+  const stats = getPnrStats();
+  const setN = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+  setN('pnr-abertas', stats.abertas);
+  setN('pnr-resolvidas', stats.resolvidas);
+  const taxaEl = document.getElementById('pnr-taxa');
+  if (taxaEl) {
+    if (stats.total === 0) { taxaEl.textContent = '—'; taxaEl.classList.remove('high','low'); }
+    else {
+      const taxa = (stats.resolvidas / stats.total * 100);
+      taxaEl.textContent = taxa.toFixed(0) + '%';
+      taxaEl.classList.toggle('high', taxa >= 70);
+      taxaEl.classList.toggle('low',  taxa < 50);
+    }
+  }
+  // Animação pulsante no mini-KPI Abertas se > 0
+  const openKpi = card.querySelector('.pnr-mini-open');
+  if (openKpi) openKpi.classList.toggle('has-open', stats.abertas > 0);
+  // Barras horizontais
+  const total = Math.max(stats.total, 1);
+  const setBar = (id, val) => { const e = document.getElementById(id); if (e) e.style.width = (val/total*100) + '%'; };
+  setBar('pnr-bar-abertas',    stats.abertas);
+  setBar('pnr-bar-resolvidas', stats.resolvidas);
+  setN('pnr-bar-abertas-txt',    `${stats.abertas} / ${stats.total}`);
+  setN('pnr-bar-resolvidas-txt', `${stats.resolvidas} / ${stats.total}`);
+}
+
+// ═══════════════════════════════════════════════════
+// PNR TRACKING — registra abertura/resolução de cada reclamação por op + data
+// localStorage: pnr_log_{OP}_{YYYY-MM-DD} = { rota: { abertaEm, fechadaEm } }
+// ═══════════════════════════════════════════════════
+function pnrLogKey() {
+  const today = new Date().toISOString().slice(0,10);
+  return `pnr_log_${currentOperation}_${today}`;
+}
+function getPnrLog() {
+  try {
+    return JSON.parse(localStorage.getItem(pnrLogKey()) || '{}');
+  } catch(e) { return {}; }
+}
+function setPnrLog(log) {
+  try { localStorage.setItem(pnrLogKey(), JSON.stringify(log)); } catch(e) {}
+}
+// Compara drivers atuais com o log salvo e atualiza abertura/resolução
+function syncPnrLog() {
+  if (!drivers || !drivers.length) return;
+  if (currentOperation === 'GERAL' || currentOperation === 'HISTORICO') return;
+  const log = getPnrLog();
+  const now = Date.now();
+  // Mapa de rotas que TEM PNR ativa agora (auto OU manual)
+  const currentActive = new Set();
+  drivers.forEach(d => {
+    const hasAuto   = (d.pnrCount || 0) > 0;
+    const hasManual = !!(extras[d.rota] && extras[d.rota].pnr);
+    if (hasAuto || hasManual) currentActive.add(d.rota);
+  });
+  // Para cada rota com PNR ativa agora, abre se ainda não estava
+  currentActive.forEach(rota => {
+    if (!log[rota]) log[rota] = { abertaEm: now, fechadaEm: null };
+    else if (log[rota].fechadaEm) {
+      // Reabriu! Limpa fechadaEm
+      log[rota].fechadaEm = null;
+    }
+  });
+  // Para cada rota que JÁ estava aberta no log mas NÃO está mais ativa, marca fechadaEm
+  Object.keys(log).forEach(rota => {
+    if (log[rota] && !log[rota].fechadaEm && !currentActive.has(rota)) {
+      log[rota].fechadaEm = now;
+    }
+  });
+  setPnrLog(log);
+}
+// Estatísticas para o card
+function getPnrStats() {
+  const log = getPnrLog();
+  const rotas = Object.keys(log);
+  const abertas = rotas.filter(r => log[r] && !log[r].fechadaEm).length;
+  const resolvidas = rotas.filter(r => log[r] && log[r].fechadaEm).length;
+  const total = abertas + resolvidas;
+  return { abertas, resolvidas, total, log };
+}
+// Verifica se uma rota foi resolvida nas últimas 2 horas (para mostrar badge ✅ PNR resolvida)
+function pnrRecentlyResolved(rota) {
+  const log = getPnrLog();
+  const entry = log[rota];
+  if (!entry || !entry.fechadaEm) return false;
+  const TWO_HOURS = 2 * 60 * 60 * 1000;
+  return (Date.now() - entry.fechadaEm) < TWO_HOURS;
 }
 
 // Registra horário do import — 1º import = abertura (travado), demais = fechamento (atualizado).
@@ -2305,16 +2473,21 @@ function renderQuickView(){
     const ex=extras[d.rota]||{};
     const bg=p>=80?'#f1f8e9':p>=50?'#fff8e1':'#ffebee';
     const bc=p>=80?'#a5d6a7':p>=50?'#ffcc80':'#ef9a9a';
+    // PNR efetivo: auto-detectado do texto Meli OU marcado manualmente
+    const pnrActive = ((d.pnrCount || 0) > 0) || !!ex.pnr;
+    const pnrRecentResolved = !pnrActive && pnrRecentlyResolved(d.rota);
     let badges=[];
     if(d.atrasada)badges.push(`<span class="badge badge-red">Atrasada</span>`);
-    if(ex.pnr)badges.push(`<span class="badge badge-pink-pnr">⚡ PNR ATIVA</span>`);
+    if(pnrActive)badges.push(`<span class="badge badge-pink-pnr">⚡ PNR ATIVA${(d.pnrCount||0)>1 ? ' ('+d.pnrCount+')' : ''}</span>`);
+    else if(pnrRecentResolved)badges.push(`<span class="badge badge-pnr-resolved">✅ PNR resolvida</span>`);
     if(d.ambu)badges.push(`<span class="badge badge-ambu">🚑 ${d.ambuCount||1} ambul.</span>`);
     if(d.status==='Retorno pausado')badges.push(`<span class="badge badge-sleepover">⏸ SLEEPOVER · 10h SC</span>`);
     if(d.fail>0)badges.push(`<span class="badge badge-red">${d.fail} falha(s)</span>`);
     if(d.status==='Concluída')badges.push(`<span class="badge badge-blue">✓</span>`);
-    const pnrClass   = ex.pnr ? ' has-pnr' : '';
-    const ambuClass  = d.ambu ? ' has-ambu' : '';
-    const sleepClass = d.status === 'Retorno pausado' ? ' has-sleepover' : '';
+    const pnrClass    = pnrActive ? ' has-pnr' : '';
+    const resolvClass = pnrRecentResolved ? ' recently-resolved-pnr' : '';
+    const ambuClass   = d.ambu ? ' has-ambu' : '';
+    const sleepClass  = d.status === 'Retorno pausado' ? ' has-sleepover' : '';
     // Tag só aparece em sacas em trânsito (cards sem motorista, a caminho do NEx/DC)
     // Cards com motorista (gaiola mãe / nex local) ficam limpos — motorista é o padrão
     let kindTag = '';
@@ -2334,7 +2507,7 @@ function renderQuickView(){
         <span class="qv-adr-pct">${comerPct.toFixed(0)}% com</span>
       </div>`;
     }
-    return `<div class="qv-card${pnrClass}${ambuClass}${sleepClass}" style="background:${bg};border-color:${bc}">
+    return `<div class="qv-card${pnrClass}${resolvClass}${ambuClass}${sleepClass}" style="background:${bg};border-color:${bc}">
       ${kindTag}
       <div class="qv-name">${d.nome}</div>
       <div class="qv-rota">${d.rota} · ${d.ok}/${d.spr}${d.nexAgencia ? ' · '+d.nexAgencia : ''}</div>
@@ -2953,9 +3126,10 @@ function switchOperation(op, btn) {
     // destroy charts
     Object.keys(charts).forEach(id => { if(charts[id]){charts[id].destroy();delete charts[id];} });
     renderSnapButtons();
-    // Esconder Overview e Report da op anterior (cada SSP é isolado)
+    // Esconder Overview, Report e PNR Status da op anterior (cada SSP é isolado)
     renderOverviewCard();
     renderReportCard();
+    renderPnrStatusCard();
   }
 
   // Re-attach Firebase listeners for new operation
@@ -3797,7 +3971,7 @@ async function wipeAllData() {
     // Apagar nome do operador, horários de turno e dados de report salvos localmente
     localStorage.removeItem('ov_operator_name');
     Object.keys(localStorage)
-      .filter(k => k.startsWith('ov_open_') || k.startsWith('ov_close_') || k.startsWith('ov_resumo_') || k.startsWith('rp_'))
+      .filter(k => k.startsWith('ov_open_') || k.startsWith('ov_close_') || k.startsWith('ov_resumo_') || k.startsWith('rp_') || k.startsWith('pnr_log_'))
       .forEach(k => localStorage.removeItem(k));
     const ovInput = document.getElementById('ovOperator');
     if (ovInput) ovInput.value = '';
