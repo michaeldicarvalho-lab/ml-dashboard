@@ -1556,7 +1556,24 @@ function parseText(raw){
 
   const NOISE = /^(SPR|OZH|ORH|MLP|Walker|toc|icon-|CHEVRON|pending|warning|incident|stem|percurso|transferiu|recebeu|ver\s+detalhe|ver\s+rutas|esconder|filtros|performance|searchbox|procurar|monitoramento|esta[çc][aã]o|equipes|externas|seguran[çc]a|mercadoenvios|\+\d+|você\s+está|rotas\s+totais|de\s+entrega|de\s+coleta|mistas|em\s+andamento|pacotes|sacas|pendentes|com\s+falhas|bem-sucedidos|veículos|com\s+entregas|alertas?\s+ativos?|incidências|histórico|não\s+há\s+alertas?|esta\s+rota|fast\s+promise|promessa\s+fast|cpt\s+past)/i;
   const SKIP = new Set(['SPR','OZH','ORH','MLP','Walker','toc','-','1','2','3','4','5','6','7','8','9','0','100']);
-  const NOT_NAME = /utilitários?|DCG|SDD-|BRN|SSP\d|AM\d|PM\d|SD$|MLP|Walker|Planejado|Executado|Conclu|andamento|caminho|pausado|atrasada|prestes|ambulância|paradas?|comerciais?|residenciais?|unidades?|fora\s+da|NEx|BRNSP|BRDSP|fast|promessa|passeio|Moto\s+ME|Veiculo|CPT:|Hoje|\d/i;
+  // Lista de palavras/padrões que NUNCA são nomes de motoristas (evita falso positivo)
+  // Categorias: status, tipos de veículo, agências, empresas/DSPs parceiras, abreviações Meli
+  const NOT_NAME = new RegExp([
+    // Status e indicadores Meli
+    'utilit[aá]rios?','DCG','SDD-','SDD$','BRN','SSP\\d','AM\\d','PM\\d','SD$','MLP','Walker',
+    'Planejado','Executado','Conclu','andamento','caminho','pausado','atrasada','prestes',
+    'ambul[âa]ncia','paradas?','comerciais?','residenciais?','unidades?','fora\\s+da','retorno',
+    'NEx','BRNSP','BRDSP','fast','promessa','passeio','CPT:','Hoje',
+    // Tipos de veículo
+    'Moto\\s+ME','Veiculo','VUC(\\s+SDD)?','SDD$','ME\\s+Extra','Passeio\\s+Extra',
+    // Empresas / DSPs parceiras (logísticas) — comuns no Mercado Envios
+    'Kangu(\\s+Logistics)?','Loggi','Sequoia','Jadlog','Total\\s+Express','JT\\s+Express',
+    'Mandae','Direct(\\s+Log)?','Azul\\s+Cargo','TNT','Correios','J&T','SHEIN',
+    // Termos genéricos de logística (em PT e EN)
+    'Logistics?','Express','Cargo','Transporte','Service\\s+Center','Hub',
+    // Qualquer linha que comece com número
+    '^\\d',
+  ].join('|'), 'i');
 
   const results = [];
 
