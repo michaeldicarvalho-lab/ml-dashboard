@@ -443,7 +443,47 @@ tr.total-row td{border-top:2px solid #90a4ae;font-size:11px;color:var(--blue);}
 .footer{text-align:center;font-size:11px;color:var(--text3);padding:14px 0 10px;}
 .footer strong{color:var(--text2);}
 
-@media(max-width:768px){.charts-grid,.charts-grid2{grid-template-columns:1fr;}.fb-fields{grid-template-columns:1fr;}}
+@media(max-width:768px){
+  .charts-grid,.charts-grid2{grid-template-columns:1fr;}
+  .fb-fields{grid-template-columns:1fr;}
+  /* Modal Fechar Turno em tela cheia no mobile */
+  .ft-modal{max-width:96vw;width:96vw;max-height:92vh;overflow-y:auto;padding:18px;}
+  .ft-modal h2{font-size:15px;}
+  .ft-fields select,.ft-fields input{font-size:15px;padding:10px 12px;}
+  .ft-btns{flex-direction:column-reverse;gap:8px;}
+  .ft-btns button{width:100%;padding:12px;font-size:14px;}
+  /* Modal genérico (PNR / Rota pausada) cabe melhor */
+  .modal-box{width:96vw;max-width:96vw;padding:14px;}
+  /* Report Regional: 1 coluna, inputs maiores no toque */
+  .rp-fields{grid-template-columns:1fr 1fr;}
+  .rp-fields input,.rp-fields select{font-size:15px;padding:9px 10px;}
+  .rp-obs{font-size:14px;padding:11px;}
+  .rp-actions{position:static;display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+  .rp-actions button{flex:1;min-width:0;font-size:11px;padding:8px 6px;}
+  /* Overview de Fechamento: ações empilhadas, sem absolute */
+  .ov-actions{position:static;display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+  .ov-actions button{flex:1;min-width:0;font-size:11px;padding:8px 6px;}
+  .overview-card,.report-card{padding:14px;}
+  .ov-top-stats{gap:14px;}
+  .ov-stat-val{font-size:20px;}
+}
+
+/* ── FLOATING ACTION BUTTON (FAB) — só aparece no mobile ── */
+.fab-container{display:none;}
+@media(max-width:768px){
+  .fab-container{display:flex;flex-direction:column;align-items:flex-end;gap:10px;position:fixed;bottom:18px;right:18px;z-index:8500;}
+  .fab-menu{display:none;flex-direction:column;gap:8px;animation:fabSlideUp .2s ease;}
+  .fab-menu.open{display:flex;}
+  .fab-action{background:#fff;color:#1565c0;border:1px solid #90caf9;border-radius:99px;padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.18);display:flex;align-items:center;gap:8px;white-space:nowrap;}
+  .fab-action.fab-close-turno{background:linear-gradient(135deg,#1b5e20,#2e7d32);color:#fff;border-color:#1b5e20;}
+  .fab-action.fab-report{background:linear-gradient(135deg,#283593,#1565c0);color:#fff;border-color:#283593;}
+  .fab-action.fab-overview{background:linear-gradient(135deg,#e65100,#bf360c);color:#fff;border-color:#e65100;}
+  .fab-action:active{transform:scale(.96);}
+  .fab-main{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#1a237e,#1565c0);color:#fff;border:none;font-size:26px;cursor:pointer;box-shadow:0 6px 20px rgba(26,35,126,.4);display:flex;align-items:center;justify-content:center;transition:transform .2s;}
+  .fab-main.open{transform:rotate(45deg);background:linear-gradient(135deg,#b71c1c,#c62828);}
+  @keyframes fabSlideUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+}
+[data-theme="dark"] .fab-action{background:#222837;color:#82b1ff;border-color:#42a5f5;}
 
 /* ── OPERATION TABS ── */
 .ops-tabs{background:linear-gradient(135deg,#0d1b6e 0%,#1a237e 100%);padding:0 20px;display:flex;align-items:flex-end;gap:4px;overflow-x:auto;}
@@ -4016,7 +4056,73 @@ async function confirmarFechamento() {
     if (saveBtn) { saveBtn.disabled = false; saveBtn.style.opacity = ''; saveBtn.style.cursor = ''; }
   }
 }
+
+// ═══════════════════════════════════════════════════
+// FAB (Floating Action Button) — atalho mobile para Fechar Turno + Report + Overview
+// ═══════════════════════════════════════════════════
+function toggleFabMenu() {
+  const menu = document.getElementById('fabMenu');
+  const main = document.getElementById('fabMain');
+  if (!menu || !main) return;
+  const open = menu.classList.toggle('open');
+  main.classList.toggle('open', open);
+  main.textContent = open ? '×' : '+';
+}
+function fabAction(action) {
+  // Fecha o menu primeiro
+  document.getElementById('fabMenu')?.classList.remove('open');
+  const main = document.getElementById('fabMain');
+  if (main) { main.classList.remove('open'); main.textContent = '+'; }
+
+  if (action === 'fechar-turno') {
+    if (typeof fecharTurno === 'function') fecharTurno();
+  } else if (action === 'report') {
+    const card = document.getElementById('reportCard');
+    if (!card || card.style.display === 'none') {
+      showToast('⚠ Importe dados primeiro para preencher o Report.', 'warn');
+      return;
+    }
+    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Foco no primeiro campo manual após o scroll
+    setTimeout(() => document.getElementById('rp-scheduling')?.focus(), 600);
+  } else if (action === 'overview') {
+    const card = document.getElementById('overviewCard');
+    if (!card || card.style.display === 'none') {
+      showToast('⚠ Importe dados primeiro para ver o Overview.', 'warn');
+      return;
+    }
+    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+// Fecha o menu se clicar fora dele
+document.addEventListener('click', e => {
+  const fab = document.querySelector('.fab-container');
+  if (!fab || !fab.contains(e.target)) {
+    document.getElementById('fabMenu')?.classList.remove('open');
+    const main = document.getElementById('fabMain');
+    if (main && main.classList.contains('open')) {
+      main.classList.remove('open');
+      main.textContent = '+';
+    }
+  }
+});
 </script>
+
+<!-- FAB (Floating Action Button) — mobile only, atalho rápido pras ações principais -->
+<div class="fab-container">
+  <div class="fab-menu" id="fabMenu">
+    <button class="fab-action fab-overview" onclick="fabAction('overview')" title="Ir para Overview de Fechamento">
+      📸 Overview de Fechamento
+    </button>
+    <button class="fab-action fab-report" onclick="fabAction('report')" title="Ir para Report Regional">
+      📋 Report Regional
+    </button>
+    <button class="fab-action fab-close-turno" onclick="fabAction('fechar-turno')" title="Fechar Turno e Salvar Histórico">
+      📦 Fechar Turno
+    </button>
+  </div>
+  <button class="fab-main" id="fabMain" onclick="toggleFabMenu(); event.stopPropagation();" aria-label="Ações rápidas">+</button>
+</div>
 
 </body>
 </html>
