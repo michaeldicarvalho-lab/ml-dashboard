@@ -604,9 +604,12 @@ tr.total-row td{border-top:2px solid #90a4ae;font-size:11px;color:var(--blue);}
 .geral-empty{background:var(--surface2);color:var(--text3);padding:24px;text-align:center;border-radius:var(--radius);font-size:13px;}
 .geral-chart-wrap{position:relative;height:320px;width:100%;}
 @media(max-width:768px){.geral-chart-wrap{height:240px;}}
-/* Grid de Overviews de Fechamento (Geral e Histórico) */
-.ovx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px;margin-bottom:13px;}
-.ovx-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+/* Grid de Overviews de Fechamento (Geral e Histórico) — visual executivo */
+.ovx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px;margin-bottom:13px;}
+.ovx-card{background:linear-gradient(135deg,#fff 0%,#f8fafc 100%);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,.05);position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;}
+.ovx-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#1a237e,#1565c0,#69f0ae);}
+.ovx-card:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(26,35,126,.12);}
+[data-theme="dark"] .ovx-card{background:linear-gradient(135deg,var(--surface) 0%,var(--surface2) 100%);}
 .ovx-card .ovx-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:9px;gap:8px;}
 .ovx-card .ovx-op{font-size:14px;font-weight:700;color:#1a237e;}
 .ovx-card .ovx-cidade{font-size:11px;color:var(--text2);font-weight:500;display:block;}
@@ -631,6 +634,28 @@ tr.total-row td{border-top:2px solid #90a4ae;font-size:11px;color:var(--blue);}
 [data-theme="dark"] .ovx-card .ovx-offenders li strong{color:#82b1ff;}
 [data-theme="dark"] .ovx-card .ovx-offenders li .ovx-name{color:#ff80ab;}
 .ovx-empty{padding:24px;text-align:center;color:var(--text3);font-size:12px;background:var(--surface2);border-radius:var(--radius);}
+/* Reports da Regional — mini-cards read-only para o gestor */
+.rpx-card{background:linear-gradient(135deg,#fff 0%,#fafbfc 100%);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,.05);position:relative;overflow:hidden;}
+.rpx-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#283593,#1565c0,#5e35b1);}
+.rpx-card .rpx-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.rpx-card .rpx-op{font-size:14px;font-weight:700;color:#1a237e;}
+.rpx-card .rpx-cidade{font-size:11px;color:var(--text2);font-weight:500;display:block;}
+.rpx-card .rpx-ciclo{font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px;background:linear-gradient(135deg,#5e35b1,#4527a0);color:#fff;text-transform:uppercase;}
+.rpx-card .rpx-operator{font-size:12px;color:#c2185b;font-weight:600;margin-bottom:10px;}
+.rpx-card .rpx-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:9px;}
+.rpx-card .rpx-metric{background:var(--surface2);border-radius:var(--radius-sm);padding:8px 6px;text-align:center;}
+.rpx-card .rpx-metric-label{font-size:9px;text-transform:uppercase;color:var(--text2);letter-spacing:.03em;font-weight:700;}
+.rpx-card .rpx-metric-val{font-size:18px;font-weight:800;color:var(--text);line-height:1;margin-top:3px;}
+.rpx-card .rpx-metric.sched .rpx-metric-val{color:#1a237e;}
+.rpx-card .rpx-metric.ofer  .rpx-metric-val{color:var(--blue);}
+.rpx-card .rpx-metric.carr  .rpx-metric-val{color:var(--green-mid);}
+.rpx-card .rpx-metric.ns    .rpx-metric-val{color:var(--red);}
+.rpx-card .rpx-extras{background:linear-gradient(135deg,rgba(46,125,50,.1),rgba(46,125,50,.04));border-left:3px solid var(--green-mid);padding:7px 10px;border-radius:5px;font-size:11px;color:var(--green);font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:5px;}
+.rpx-card .rpx-obs{background:var(--surface2);border-radius:5px;padding:8px 10px;font-size:12px;color:var(--text);font-style:italic;line-height:1.4;}
+.rpx-card .rpx-obs strong{color:var(--text2);font-style:normal;font-weight:700;}
+.rpx-card .rpx-no-obs{font-size:11px;color:var(--text3);font-style:italic;padding:4px 0;}
+[data-theme="dark"] .rpx-card{background:linear-gradient(135deg,var(--surface) 0%,var(--surface2) 100%);}
+[data-theme="dark"] .rpx-card .rpx-op{color:#82b1ff;}
 
 /* ── EXECUTIVE OVERVIEW (topo da Geral) ── */
 .exec-overview-card{background:linear-gradient(135deg,#0d1b6e 0%,#1a237e 50%,#1565c0 100%);color:#fff;border-radius:var(--radius);padding:18px 22px;margin-bottom:14px;box-shadow:0 4px 16px rgba(26,35,126,.25);}
@@ -651,16 +676,25 @@ tr.total-row td{border-top:2px solid #90a4ae;font-size:11px;color:var(--blue);}
 .geral-pnr-header{margin-bottom:12px;}
 .geral-pnr-header h3{font-size:14px;font-weight:700;color:#c2185b;display:flex;align-items:center;gap:6px;margin-bottom:2px;}
 .geral-pnr-subtitle{font-size:11px;color:var(--text2);font-style:italic;}
-.geral-pnr-totals{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:9px;padding:10px 0 12px;margin-bottom:12px;border-bottom:1px dashed var(--border);}
-.geral-pnr-total{background:linear-gradient(135deg,#fce4ec,#f8bbd0);border:1px solid #f48fb1;border-radius:var(--radius-sm);padding:9px 12px;text-align:center;}
-.geral-pnr-total .gpt-label{font-size:9px;text-transform:uppercase;letter-spacing:.04em;color:#880e4f;font-weight:700;}
-.geral-pnr-total .gpt-val{font-size:22px;font-weight:800;color:#c2185b;line-height:1.05;margin-top:3px;}
-.geral-pnr-total.resolvidas{background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border-color:#a5d6a7;}
-.geral-pnr-total.resolvidas .gpt-label{color:#1b5e20;}
-.geral-pnr-total.resolvidas .gpt-val{color:var(--green-mid);}
-.geral-pnr-total.taxa{background:linear-gradient(135deg,#e3f2fd,#bbdefb);border-color:#90caf9;}
-.geral-pnr-total.taxa .gpt-label{color:#0d47a1;}
-.geral-pnr-total.taxa .gpt-val{color:var(--blue-mid);}
+.geral-pnr-totals{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;padding:14px 0 16px;margin-bottom:14px;border-bottom:1px dashed var(--border);}
+.geral-pnr-total{background:linear-gradient(135deg,#c2185b,#880e4f);border:none;border-radius:var(--radius);padding:14px 18px;text-align:left;color:#fff;box-shadow:0 4px 12px rgba(194,24,91,.25);position:relative;overflow:hidden;}
+.geral-pnr-total::after{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.08);}
+.geral-pnr-total .gpt-label{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.88);font-weight:700;margin-bottom:5px;}
+.geral-pnr-total .gpt-val{font-size:32px;font-weight:800;color:#fff;line-height:1;}
+.geral-pnr-total.resolvidas{background:linear-gradient(135deg,#2e7d32,#1b5e20);box-shadow:0 4px 12px rgba(27,94,32,.25);}
+.geral-pnr-total.taxa{background:linear-gradient(135deg,#1565c0,#0d47a1);box-shadow:0 4px 12px rgba(13,71,161,.25);}
+/* Seção de evolução por SSP — barras de progresso de resolução */
+.geral-pnr-evolution{background:var(--surface2);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:12px;}
+.geral-pnr-evolution h4{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;display:flex;align-items:center;gap:5px;}
+.evo-row{display:flex;align-items:center;gap:10px;font-size:11px;padding:5px 0;}
+.evo-row-name{min-width:75px;font-weight:700;color:#1a237e;}
+.evo-row-track{flex:1;height:18px;background:var(--surface);border-radius:99px;overflow:hidden;border:1px solid var(--border);position:relative;}
+.evo-row-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#2e7d32,#1b5e20);display:flex;align-items:center;padding-left:8px;color:#fff;font-size:10px;font-weight:700;transition:width .8s ease;}
+.evo-row-numbers{min-width:80px;text-align:right;font-weight:700;color:var(--text2);}
+.evo-row-numbers .evo-abertas{color:#c2185b;}
+.evo-row-numbers .evo-resolvidas{color:var(--green-mid);}
+.evo-empty{color:var(--text3);font-size:11px;font-style:italic;text-align:center;padding:10px;}
+[data-theme="dark"] .evo-row-name{color:#82b1ff;}
 .geral-pnr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;}
 .geral-pnr-op-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;transition:transform .15s,box-shadow .15s;cursor:pointer;}
 .geral-pnr-op-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.1);}
@@ -828,7 +862,7 @@ tr.total-row td{border-top:2px solid #90a4ae;font-size:11px;color:var(--blue);}
     </div>
   </div>
 
-  <!-- Executive Overview Global — visão estratégica de tomada de decisão -->
+  <!-- Executive Overview Global — visão estratégica de tomada de decisão (única fonte de KPIs) -->
   <div class="exec-overview-card">
     <h3>🎯 Overview Executivo — Regional</h3>
     <div class="exec-sub">Métricas estratégicas de todas as bases consolidadas para tomada de decisão</div>
@@ -843,13 +877,28 @@ tr.total-row td{border-top:2px solid #90a4ae;font-size:11px;color:var(--blue);}
         <div class="exec-cell-val" id="exec-pacotes">—</div>
         <div class="exec-cell-sub" id="exec-rotas-sub">— rotas no dia</div>
       </div>
+      <div class="exec-cell highlight-good">
+        <div class="exec-cell-label">✅ Bem-sucedidos</div>
+        <div class="exec-cell-val" id="exec-ok">—</div>
+        <div class="exec-cell-sub" id="exec-ok-pct">—</div>
+      </div>
+      <div class="exec-cell highlight-warn">
+        <div class="exec-cell-label">⏳ Pendentes</div>
+        <div class="exec-cell-val" id="exec-pend">—</div>
+        <div class="exec-cell-sub" id="exec-pend-pct">—</div>
+      </div>
+      <div class="exec-cell highlight-bad">
+        <div class="exec-cell-label">❌ Falhas</div>
+        <div class="exec-cell-val" id="exec-fail">—</div>
+        <div class="exec-cell-sub" id="exec-fail-pct">—</div>
+      </div>
       <div class="exec-cell">
-        <div class="exec-cell-label">DS Regional</div>
+        <div class="exec-cell-label">🚀 DS Regional</div>
         <div class="exec-cell-val" id="exec-ds">—</div>
         <div class="exec-cell-sub">média ponderada</div>
       </div>
       <div class="exec-cell">
-        <div class="exec-cell-label">Progresso geral</div>
+        <div class="exec-cell-label">✓ Progresso geral</div>
         <div class="exec-cell-val" id="exec-progress">—</div>
         <div class="exec-cell-sub" id="exec-progress-sub">— concluídas</div>
       </div>
@@ -868,24 +917,12 @@ tr.total-row td{border-top:2px solid #90a4ae;font-size:11px;color:var(--blue);}
         <div class="exec-cell-val" id="exec-pnr">—</div>
         <div class="exec-cell-sub" id="exec-pnr-sub">—</div>
       </div>
-      <div class="exec-cell">
+      <div class="exec-cell highlight-bad">
         <div class="exec-cell-label">🚨 Alertas críticos</div>
         <div class="exec-cell-val" id="exec-alerts">—</div>
         <div class="exec-cell-sub" id="exec-alerts-sub">rotas exigem ação</div>
       </div>
     </div>
-  </div>
-
-  <!-- KPIs Consolidados -->
-  <div class="kpi-grid" id="geralKpiGrid">
-    <div class="kpi"><div class="k-label">Operações ativas</div><div class="k-val" id="g-ops">—</div><div class="k-sub">de 13</div></div>
-    <div class="kpi"><div class="k-label">Total Rotas</div><div class="k-val" id="g-rotas">—</div><div class="k-sub">somadas</div></div>
-    <div class="kpi"><div class="k-label">Total Pacotes</div><div class="k-val" id="g-pacotes">—</div><div class="k-sub">SPR somado</div></div>
-    <div class="kpi kpi-green"><div class="k-label">Bem-sucedidos</div><div class="k-val" id="g-ok">—</div><div class="k-sub" id="g-ok-pct">—</div></div>
-    <div class="kpi kpi-amber"><div class="k-label">Pendentes</div><div class="k-val" id="g-pend">—</div><div class="k-sub" id="g-pend-pct">—</div></div>
-    <div class="kpi kpi-red"><div class="k-label">Falhas</div><div class="k-val" id="g-fail">—</div><div class="k-sub" id="g-fail-pct">—</div></div>
-    <div class="kpi kpi-purple"><div class="k-label">DS Geral</div><div class="k-val" id="g-ds">—</div><div class="k-sub">média ponderada</div></div>
-    <div class="kpi kpi-blue"><div class="k-label">Concluídas</div><div class="k-val" id="g-conc">—</div><div class="k-sub" id="g-conc-pct">rotas finalizadas</div></div>
   </div>
 
   <!-- Gráfico de comparação DS% por operação -->
@@ -949,8 +986,26 @@ tr.total-row td{border-top:2px solid #90a4ae;font-size:11px;color:var(--blue);}
         <div class="gpt-val" id="gpnr-total-taxa">—</div>
       </div>
     </div>
+    <!-- Evolução de resolução por SSP — barras de progresso -->
+    <div class="geral-pnr-evolution">
+      <h4>📈 Evolução por operação — taxa de resolução</h4>
+      <div id="geralPnrEvolution">
+        <div class="evo-empty">Sem PNRs registradas hoje.</div>
+      </div>
+    </div>
     <div class="geral-pnr-grid" id="geralPnrGrid">
       <div class="ovx-empty">Aguardando dados das operações…</div>
+    </div>
+  </div>
+
+  <!-- Reports da Regional — visualização READ-ONLY para o gestor dos reports enviados pelos operadores -->
+  <div class="geral-rank-card" id="geralReportsSection" style="display:none">
+    <h3 style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
+      <span>📑 Reports da Regional — Hoje</span>
+      <span style="font-size:11px;font-weight:500;color:var(--text2);font-style:italic">Visão consolidada do que cada operação enviou (somente leitura)</span>
+    </h3>
+    <div id="geralReportsGrid" class="ovx-grid">
+      <div class="ovx-empty">Aguardando operações fecharem turno e enviarem reports…</div>
     </div>
   </div>
 </div>
@@ -3503,18 +3558,9 @@ function renderGeralView() {
   const totalFail  = withData.reduce((s,a)=>s+a.fail,0);
   const totalConc  = withData.reduce((s,a)=>s+a.concluidas,0);
   const dsGeral    = totalSpr > 0 ? (totalOk/totalSpr*100) : 0;
-  const set = (id,v) => { const e = document.getElementById(id); if(e) e.textContent = v; };
+  // KPIs antigos removidos — agora tudo é renderizado no Executive Overview (renderExecutiveOverview)
+  // Variáveis totalSpr/totalOk/etc continuam disponíveis abaixo para o gráfico e ranking
   const fmt = n => (n||0).toLocaleString('pt-BR');
-  const pct = (n,t) => t > 0 ? ((n/t*100).toFixed(1) + '%') : '—';
-  set('g-ops', withData.length);
-  set('g-rotas', fmt(totalRotas));
-  set('g-pacotes', fmt(totalSpr));
-  set('g-ok', fmt(totalOk));      set('g-ok-pct',  pct(totalOk, totalSpr));
-  set('g-pend', fmt(totalPend));  set('g-pend-pct',pct(totalPend, totalSpr));
-  set('g-fail', fmt(totalFail));  set('g-fail-pct',pct(totalFail, totalSpr));
-  set('g-ds', dsGeral.toFixed(1) + '%');
-  set('g-conc', totalConc + ' / ' + totalRotas);
-  set('g-conc-pct', pct(totalConc, totalRotas) + ' finalizadas');
 
   // Ranking — TODAS as 13 ops. Primeiro as com dados (por DS desc), depois as sem dados.
   const ranked = [...withData].sort((a,b)=>b.ds-a.ds);
@@ -3697,15 +3743,66 @@ async function loadTodayOverviews() {
     }));
     if (!all.length) {
       grid.innerHTML = '<div class="ovx-empty">Nenhuma operação encerrou turno hoje ainda. Os overviews aparecem aqui quando os operadores clicarem em "Fechar Turno" nas suas abas.</div>';
+      renderRegionalReports([]); // limpa também a seção de reports
       return;
     }
     // Ordena por timestamp desc (mais recentes primeiro)
     all.sort((a,b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
     grid.innerHTML = all.map(renderOverviewMiniCard).join('');
+    // Renderiza também a seção de Reports da Regional (mesmos dados)
+    renderRegionalReports(all);
   } catch(e) {
     console.error('loadTodayOverviews error:', e);
     grid.innerHTML = `<div class="ovx-empty" style="color:var(--red)">❌ Erro: ${e.message}</div>`;
   }
+}
+
+// Renderiza mini-cards de Report Regional (READ-ONLY) baseado nos turnos fechados HOJE
+function renderRegionalReports(turnos) {
+  const section = document.getElementById('geralReportsSection');
+  const grid    = document.getElementById('geralReportsGrid');
+  if (!section || !grid) return;
+  // Filtra só os turnos que têm report preenchido (com pelo menos um campo)
+  const withReport = (turnos || []).filter(t => {
+    const r = t.report || {};
+    return r.scheduling || r.ofertados || r.carregados || r.ns || r.extras || r.obs;
+  });
+  if (!withReport.length) {
+    section.style.display = 'none';
+    return;
+  }
+  section.style.display = '';
+  grid.innerHTML = withReport.map(t => {
+    const r = t.report || {};
+    const cidade = t.cidade || OP_CITIES[t.operacao] || '';
+    const extras = parseInt(r.extras || '0', 10);
+    const extrasHtml = extras > 0
+      ? `<div class="rpx-extras">✨ +${extras} extra${extras !== 1 ? 's' : ''} ofertado${extras !== 1 ? 's' : ''} em D0</div>`
+      : '';
+    const obsHtml = (r.obs || '').trim()
+      ? `<div class="rpx-obs"><strong>📝 Obs:</strong> ${(r.obs).replace(/[\r\n]+/g,' ')}</div>`
+      : '<div class="rpx-no-obs">— sem observações —</div>';
+    return `
+      <div class="rpx-card">
+        <div class="rpx-head">
+          <div>
+            <span class="rpx-op">${t.operacao}${cidade ? ' · ' + cidade : ''}</span>
+            <span class="rpx-cidade">📅 ${(t.data||'').split('-').reverse().join('/')}</span>
+          </div>
+          <span class="rpx-ciclo">${r.ciclo || t.ciclo || '—'}</span>
+        </div>
+        <div class="rpx-operator">👤 Enviado por: ${t.operador || '—'}</div>
+        <div class="rpx-grid">
+          <div class="rpx-metric sched"><div class="rpx-metric-label">Scheduling</div><div class="rpx-metric-val">${r.scheduling || '—'}</div></div>
+          <div class="rpx-metric ofer"><div class="rpx-metric-label">Ofertados</div><div class="rpx-metric-val">${r.ofertados || '—'}</div></div>
+          <div class="rpx-metric carr"><div class="rpx-metric-label">Carregados</div><div class="rpx-metric-val">${r.carregados || '—'}</div></div>
+          <div class="rpx-metric ns"><div class="rpx-metric-label">NS</div><div class="rpx-metric-val">${r.ns || '0'}</div></div>
+        </div>
+        ${extrasHtml}
+        ${obsHtml}
+      </div>
+    `;
+  }).join('');
 }
 
 // Renderiza os mini-cards no Histórico baseado no array historicoData já carregado pelo loadHistorico
@@ -3768,6 +3865,30 @@ function renderGeralPnr() {
   setN('gpnr-total-abertas', totalAbertas);
   setN('gpnr-total-resolvidas', totalResolvidas);
   setN('gpnr-total-taxa', totalGeral > 0 ? Math.round(totalResolvidas/totalGeral*100) + '%' : '—');
+
+  // Evolução por SSP — barras de progresso (só ops que tem PNR registrada)
+  const evoEl = document.getElementById('geralPnrEvolution');
+  if (evoEl) {
+    const opsComPnr = cards.filter(c => c.stats.total > 0).sort((a,b) => {
+      const taxaA = a.stats.total > 0 ? a.stats.resolvidas/a.stats.total : 0;
+      const taxaB = b.stats.total > 0 ? b.stats.resolvidas/b.stats.total : 0;
+      return taxaB - taxaA; // maior taxa primeiro
+    });
+    if (!opsComPnr.length) {
+      evoEl.innerHTML = '<div class="evo-empty">Sem PNRs registradas hoje em nenhuma operação.</div>';
+    } else {
+      evoEl.innerHTML = opsComPnr.map(({op, stats}) => {
+        const taxa = Math.round(stats.resolvidas/stats.total*100);
+        return `<div class="evo-row">
+          <span class="evo-row-name">${op}</span>
+          <div class="evo-row-track">
+            <div class="evo-row-fill" style="width:${taxa}%">${taxa >= 15 ? taxa+'%' : ''}</div>
+          </div>
+          <span class="evo-row-numbers"><span class="evo-resolvidas">${stats.resolvidas}</span>/<span class="evo-abertas">${stats.abertas}</span> de ${stats.total}</span>
+        </div>`;
+      }).join('');
+    }
+  }
 
   // Ordena: críticos (mais abertas) primeiro, depois com dados, depois sem
   cards.sort((a,b) => {
@@ -3836,13 +3957,19 @@ function renderExecutiveOverview() {
 
   set('exec-ops', withData.length);
 
-  const totalSpr = withData.reduce((s,a)=>s+a.spr, 0);
-  const totalOk  = withData.reduce((s,a)=>s+a.ok, 0);
+  const totalSpr  = withData.reduce((s,a)=>s+a.spr, 0);
+  const totalOk   = withData.reduce((s,a)=>s+a.ok, 0);
+  const totalPend = withData.reduce((s,a)=>s+a.pend, 0);
+  const totalFail = withData.reduce((s,a)=>s+a.fail, 0);
   const totalRotas = withData.reduce((s,a)=>s+a.rotas, 0);
   const totalConc  = withData.reduce((s,a)=>s+a.concluidas, 0);
   const dsRegional = totalSpr > 0 ? (totalOk/totalSpr*100) : 0;
+  const pctFmt = n => totalSpr > 0 ? (n/totalSpr*100).toFixed(1).replace('.', ',') + '%' : '—';
   set('exec-pacotes', fmt(totalSpr));
   set('exec-rotas-sub', fmt(totalRotas) + ' rotas no dia');
+  set('exec-ok',  fmt(totalOk));    set('exec-ok-pct',  pctFmt(totalOk));
+  set('exec-pend',fmt(totalPend));  set('exec-pend-pct',pctFmt(totalPend));
+  set('exec-fail',fmt(totalFail));  set('exec-fail-pct',pctFmt(totalFail));
   set('exec-ds', dsRegional.toFixed(1).replace('.', ',') + '%');
   set('exec-progress', totalRotas > 0 ? Math.round(totalConc/totalRotas*100) + '%' : '—');
   set('exec-progress-sub', totalConc + ' de ' + totalRotas + ' concluídas');
