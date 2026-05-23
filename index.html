@@ -3,6 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Cache-busting: força o navegador a sempre buscar a versão mais nova (evita features sumirem após deploy) -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="dashboard-version" content="2026-05-23-v2">
 <title>Dashboard Logístico · Mercado Envios</title>
 <meta name="theme-color" content="#1a237e">
 <meta name="mobile-web-app-capable" content="yes">
@@ -168,6 +173,22 @@ textarea#rawInput:focus{outline:2px solid var(--blue-mid);border-color:transpare
 .step{background:#fff;border-radius:var(--radius-sm);padding:9px;border:1px solid #b3d9f7;}
 .step-num{width:19px;height:19px;border-radius:50%;background:var(--blue-mid);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-bottom:4px;}
 .step p{font-size:11px;color:var(--text2);line-height:1.5;}
+
+/* ── Visibilidade persistente dos cards (overview, report) ── */
+.card-hidden { display: none !important; }
+.card-collapse-btn{
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text2);
+  border-radius: var(--radius-sm);
+  padding: 4px 9px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  line-height: 1;
+}
+.card-collapse-btn:hover { background: var(--surface2); color: var(--text); }
 
 /* ── OVERVIEW DE FECHAMENTO ── */
 .overview-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 22px;margin-bottom:13px;position:relative;box-shadow:0 1px 3px rgba(0,0,0,.04);}
@@ -1311,6 +1332,7 @@ tr.total-row td{border-top:2px solid #90a4ae;font-size:11px;color:var(--blue);}
     <button class="ov-action-btn" onclick="copyOvImage()" title="Gera imagem do card e copia para o clipboard — cole no WhatsApp com Ctrl+V">📸 Copiar imagem</button>
     <button class="ov-action-btn secondary" onclick="downloadOvImage()" title="Baixar imagem PNG">💾 Baixar PNG</button>
     <button class="ov-action-btn secondary" onclick="copyOvText()" title="Copia o resumo como texto para colar no WhatsApp">📋 Copiar texto</button>
+    <button class="card-collapse-btn" onclick="toggleCardVisibility('overviewCard')" title="Ocultar este card (use o '+' para reexibir)">⊟</button>
   </div>
   <div class="ov-operator-row">
     <input type="text" class="ov-operator-input" id="ovOperator" placeholder="✏ Digite seu nome aqui..." oninput="saveOvOperator()" />
@@ -1350,6 +1372,7 @@ tr.total-row td{border-top:2px solid #90a4ae;font-size:11px;color:var(--blue);}
     <button class="ov-action-btn" onclick="copyReportImage()" title="Gera imagem do report e copia pro clipboard — Ctrl+V no WhatsApp">📸 Copiar imagem</button>
     <button class="ov-action-btn secondary" onclick="downloadReportImage()" title="Baixar imagem PNG">💾 Baixar PNG</button>
     <button class="ov-action-btn secondary" onclick="copyReportText()" title="Copia o report como texto formatado">📋 Copiar texto</button>
+    <button class="card-collapse-btn" onclick="toggleCardVisibility('reportCard')" title="Ocultar este card (use o '+' para reexibir)">⊟</button>
   </div>
   <h2>📋 Report Regional <span id="rpOpName" style="opacity:.7;font-weight:500"></span></h2>
   <div class="rp-fields">
@@ -4325,13 +4348,62 @@ function applyTheme(theme) {
 function toggleTheme() {
   const current = document.documentElement.getAttribute('data-theme') || 'light';
   const next = current === 'dark' ? 'light' : 'dark';
+  // Salva nas DUAS chaves para compatibilidade (nova = ssp36-theme conforme spec, antiga mantida)
+  localStorage.setItem('ssp36-theme', next);
   localStorage.setItem('ssp_theme', next);
   applyTheme(next);
 }
-// Aplicar tema salvo no carregamento
+// Aplicar tema salvo no carregamento — tenta nova chave primeiro, depois antiga
 (function initTheme(){
-  const saved = localStorage.getItem('ssp_theme') || 'light';
+  const saved = localStorage.getItem('ssp36-theme') || localStorage.getItem('ssp_theme') || 'light';
   applyTheme(saved);
+})();
+
+// ═══════════════════════════════════════════════════
+// PERSISTÊNCIA DE VISIBILIDADE DOS CARDS (overview, report) — localStorage
+// ═══════════════════════════════════════════════════
+function saveCardVisibility(cardId, visible) {
+  try { localStorage.setItem('ssp36-card-' + cardId, visible ? '1' : '0'); } catch(e) {}
+}
+function restoreCardVisibility(cardId) {
+  const el = document.getElementById(cardId);
+  if (!el) return;
+  const val = localStorage.getItem('ssp36-card-' + cardId);
+  if (val === '0') el.classList.add('card-hidden');
+  else el.classList.remove('card-hidden');
+}
+function toggleCardVisibility(cardId) {
+  const el = document.getElementById(cardId);
+  if (!el) return;
+  const hidden = el.classList.toggle('card-hidden');
+  saveCardVisibility(cardId, !hidden);
+  // Atualiza ícone do botão de colapso
+  const btn = el.querySelector('.card-collapse-btn');
+  if (btn) btn.textContent = hidden ? '▢' : '⊟';
+  if (hidden) {
+    showToast('Card ocultado. Use o "+" no canto inferior direito para mostrar novamente.', 'warn');
+  }
+}
+// Força re-exibir um card (usado pelo FAB para garantir que mesmo cards ocultos apareçam)
+function forceShowCard(cardId) {
+  const el = document.getElementById(cardId);
+  if (!el) return;
+  el.classList.remove('card-hidden');
+  saveCardVisibility(cardId, true);
+  const btn = el.querySelector('.card-collapse-btn');
+  if (btn) btn.textContent = '⊟';
+}
+// Aplica a preferência salva quando o DOM já está pronto
+(function initCardVisibility(){
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      restoreCardVisibility('overviewCard');
+      restoreCardVisibility('reportCard');
+    });
+  } else {
+    restoreCardVisibility('overviewCard');
+    restoreCardVisibility('reportCard');
+  }
 })();
 
 // ═══════════════════════════════════════════════════
@@ -4659,16 +4731,20 @@ function fabAction(action) {
     if (typeof fecharTurno === 'function') fecharTurno();
   } else if (action === 'report') {
     const card = document.getElementById('reportCard');
-    if (!card || card.style.display === 'none') {
+    if (!card) return;
+    // Se foi escondido pelo usuário, força reexibir
+    if (card.classList.contains('card-hidden')) forceShowCard('reportCard');
+    if (card.style.display === 'none') {
       showToast('⚠ Importe dados primeiro para preencher o Report.', 'warn');
       return;
     }
     card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    // Foco no primeiro campo manual após o scroll
     setTimeout(() => document.getElementById('rp-scheduling')?.focus(), 600);
   } else if (action === 'overview') {
     const card = document.getElementById('overviewCard');
-    if (!card || card.style.display === 'none') {
+    if (!card) return;
+    if (card.classList.contains('card-hidden')) forceShowCard('overviewCard');
+    if (card.style.display === 'none') {
       showToast('⚠ Importe dados primeiro para ver o Overview.', 'warn');
       return;
     }
@@ -4687,6 +4763,27 @@ document.addEventListener('click', e => {
     }
   }
 });
+
+// Garante estado inicial correto do FAB em qualquer ambiente (file:// ou https://)
+// Roda no DOMContentLoaded para evitar race conditions em produção (cache, CDN, etc.)
+function initFabSafe() {
+  const menu = document.getElementById('fabMenu');
+  const main = document.getElementById('fabMain');
+  const container = document.querySelector('.fab-container');
+  if (menu) menu.classList.remove('open');
+  if (main) { main.classList.remove('open'); main.textContent = '+'; }
+  // Força inline display:flex no container, caso algum CSS de produção sobrescreva
+  if (container) {
+    container.style.display = 'flex';
+    container.style.visibility = 'visible';
+    container.style.opacity = '1';
+  }
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initFabSafe);
+} else {
+  initFabSafe();
+}
 </script>
 
 <!-- FAB (Floating Action Button) — mobile only, atalho rápido pras ações principais -->
