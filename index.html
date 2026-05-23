@@ -610,6 +610,70 @@ tr.total-row td{border-top:2px solid #90a4ae;font-size:11px;color:var(--blue);}
 [data-theme="dark"] .ovx-card .ovx-offenders li strong{color:#82b1ff;}
 [data-theme="dark"] .ovx-card .ovx-offenders li .ovx-name{color:#ff80ab;}
 .ovx-empty{padding:24px;text-align:center;color:var(--text3);font-size:12px;background:var(--surface2);border-radius:var(--radius);}
+
+/* ── EXECUTIVE OVERVIEW (topo da Geral) ── */
+.exec-overview-card{background:linear-gradient(135deg,#0d1b6e 0%,#1a237e 50%,#1565c0 100%);color:#fff;border-radius:var(--radius);padding:18px 22px;margin-bottom:14px;box-shadow:0 4px 16px rgba(26,35,126,.25);}
+.exec-overview-card h3{font-size:14px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:7px;}
+.exec-overview-card .exec-sub{font-size:11px;opacity:.78;margin-bottom:14px;}
+.exec-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:11px;}
+.exec-cell{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:var(--radius-sm);padding:11px 13px;backdrop-filter:blur(4px);}
+.exec-cell-label{font-size:9px;text-transform:uppercase;letter-spacing:.06em;opacity:.85;margin-bottom:5px;font-weight:700;}
+.exec-cell-val{font-size:24px;font-weight:800;line-height:1;margin-bottom:3px;}
+.exec-cell-sub{font-size:10px;opacity:.7;}
+.exec-cell.highlight-good{background:linear-gradient(135deg,rgba(76,175,80,.32),rgba(46,125,50,.18));border-color:rgba(105,240,174,.55);}
+.exec-cell.highlight-bad{background:linear-gradient(135deg,rgba(244,67,54,.32),rgba(183,28,28,.2));border-color:rgba(255,138,128,.55);}
+.exec-cell.highlight-warn{background:linear-gradient(135deg,rgba(255,193,7,.32),rgba(230,81,0,.18));border-color:rgba(255,213,79,.6);}
+.exec-cell .exec-mini-name{font-size:11px;font-weight:700;}
+
+/* ── GERAL PNR — Visão por Operação ── */
+.geral-pnr-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:13px;}
+.geral-pnr-header{margin-bottom:12px;}
+.geral-pnr-header h3{font-size:14px;font-weight:700;color:#c2185b;display:flex;align-items:center;gap:6px;margin-bottom:2px;}
+.geral-pnr-subtitle{font-size:11px;color:var(--text2);font-style:italic;}
+.geral-pnr-totals{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:9px;padding:10px 0 12px;margin-bottom:12px;border-bottom:1px dashed var(--border);}
+.geral-pnr-total{background:linear-gradient(135deg,#fce4ec,#f8bbd0);border:1px solid #f48fb1;border-radius:var(--radius-sm);padding:9px 12px;text-align:center;}
+.geral-pnr-total .gpt-label{font-size:9px;text-transform:uppercase;letter-spacing:.04em;color:#880e4f;font-weight:700;}
+.geral-pnr-total .gpt-val{font-size:22px;font-weight:800;color:#c2185b;line-height:1.05;margin-top:3px;}
+.geral-pnr-total.resolvidas{background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border-color:#a5d6a7;}
+.geral-pnr-total.resolvidas .gpt-label{color:#1b5e20;}
+.geral-pnr-total.resolvidas .gpt-val{color:var(--green-mid);}
+.geral-pnr-total.taxa{background:linear-gradient(135deg,#e3f2fd,#bbdefb);border-color:#90caf9;}
+.geral-pnr-total.taxa .gpt-label{color:#0d47a1;}
+.geral-pnr-total.taxa .gpt-val{color:var(--blue-mid);}
+.geral-pnr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;}
+.geral-pnr-op-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;transition:transform .15s,box-shadow .15s;cursor:pointer;}
+.geral-pnr-op-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.1);}
+.geral-pnr-op-card.status-crit{border-left:4px solid var(--red);}
+.geral-pnr-op-card.status-warn{border-left:4px solid var(--amber-mid);}
+.geral-pnr-op-card.status-ok{border-left:4px solid var(--green-mid);}
+.geral-pnr-op-card.status-none{opacity:.5;border-left:4px solid var(--text3);}
+.geral-pnr-op-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;}
+.geral-pnr-op-name{font-size:13px;font-weight:700;color:#1a237e;}
+.geral-pnr-ciclo-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--purple-bg);color:var(--purple);text-transform:uppercase;}
+.geral-pnr-metrics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;}
+.geral-pnr-metric{display:flex;flex-direction:column;align-items:center;background:var(--surface);border-radius:5px;padding:5px 4px;}
+.geral-pnr-metric-val{font-size:18px;font-weight:800;line-height:1;}
+.geral-pnr-metric-label{font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.03em;margin-top:2px;font-weight:600;}
+.geral-pnr-metric.abertas .geral-pnr-metric-val{color:#c2185b;}
+.geral-pnr-metric.resolvidas .geral-pnr-metric-val{color:var(--green-mid);}
+.geral-pnr-metric.taxa .geral-pnr-metric-val{color:var(--blue);}
+.geral-pnr-metric.taxa .geral-pnr-metric-val.high{color:var(--green-mid);}
+.geral-pnr-metric.taxa .geral-pnr-metric-val.low{color:var(--red);}
+.geral-pnr-bar-wrap{width:100%;height:3px;background:rgba(0,0,0,.06);border-radius:99px;margin-top:3px;overflow:hidden;}
+.geral-pnr-bar{height:100%;border-radius:99px;}
+.geral-pnr-metric.abertas .geral-pnr-bar{background:#c2185b;}
+.geral-pnr-metric.resolvidas .geral-pnr-bar{background:var(--green-mid);}
+.geral-pnr-status-pill{display:inline-block;font-size:9px;font-weight:700;padding:3px 9px;border-radius:99px;text-transform:uppercase;letter-spacing:.05em;margin-top:2px;}
+.status-crit .geral-pnr-status-pill{background:var(--red-bg);color:var(--red);}
+.status-warn .geral-pnr-status-pill{background:var(--amber-bg);color:var(--amber);}
+.status-ok   .geral-pnr-status-pill{background:var(--green-bg);color:var(--green);}
+.status-none .geral-pnr-status-pill{background:var(--surface2);color:var(--text3);}
+[data-theme="dark"] .geral-pnr-total{background:rgba(194,24,91,.12);}
+[data-theme="dark"] .geral-pnr-total.resolvidas{background:rgba(76,175,80,.12);}
+[data-theme="dark"] .geral-pnr-total.taxa{background:rgba(21,101,192,.15);}
+[data-theme="dark"] .geral-pnr-op-card{background:rgba(255,255,255,.04);}
+[data-theme="dark"] .geral-pnr-metric{background:var(--surface2);}
+[data-theme="dark"] .geral-pnr-op-name{color:#82b1ff;}
 .ovx-card .ovx-resumo{margin-top:8px;padding:7px 10px;background:rgba(21,101,192,.08);border-left:3px solid var(--blue-mid);border-radius:var(--radius-sm);font-size:11px;line-height:1.5;color:var(--text);font-style:italic;}
 .ovx-card .ovx-resumo strong{color:var(--blue);font-style:normal;}
 [data-theme="dark"] .ovx-card .ovx-resumo{background:rgba(66,165,245,.12);}
@@ -743,6 +807,54 @@ tr.total-row td{border-top:2px solid #90a4ae;font-size:11px;color:var(--blue);}
     </div>
   </div>
 
+  <!-- Executive Overview Global — visão estratégica de tomada de decisão -->
+  <div class="exec-overview-card">
+    <h3>🎯 Overview Executivo — Regional</h3>
+    <div class="exec-sub">Métricas estratégicas de todas as bases consolidadas para tomada de decisão</div>
+    <div class="exec-grid">
+      <div class="exec-cell">
+        <div class="exec-cell-label">Operações ativas</div>
+        <div class="exec-cell-val" id="exec-ops">—</div>
+        <div class="exec-cell-sub">de 13 bases monitoradas</div>
+      </div>
+      <div class="exec-cell">
+        <div class="exec-cell-label">Total processado</div>
+        <div class="exec-cell-val" id="exec-pacotes">—</div>
+        <div class="exec-cell-sub" id="exec-rotas-sub">— rotas no dia</div>
+      </div>
+      <div class="exec-cell">
+        <div class="exec-cell-label">DS Regional</div>
+        <div class="exec-cell-val" id="exec-ds">—</div>
+        <div class="exec-cell-sub">média ponderada</div>
+      </div>
+      <div class="exec-cell">
+        <div class="exec-cell-label">Progresso geral</div>
+        <div class="exec-cell-val" id="exec-progress">—</div>
+        <div class="exec-cell-sub" id="exec-progress-sub">— concluídas</div>
+      </div>
+      <div class="exec-cell highlight-good" id="exec-best-cell">
+        <div class="exec-cell-label">🏆 Top performer</div>
+        <div class="exec-cell-val exec-mini-name" id="exec-best">—</div>
+        <div class="exec-cell-sub" id="exec-best-sub">—</div>
+      </div>
+      <div class="exec-cell highlight-bad" id="exec-worst-cell">
+        <div class="exec-cell-label">⚠ Requer atenção</div>
+        <div class="exec-cell-val exec-mini-name" id="exec-worst">—</div>
+        <div class="exec-cell-sub" id="exec-worst-sub">—</div>
+      </div>
+      <div class="exec-cell highlight-warn" id="exec-pnr-cell">
+        <div class="exec-cell-label">📞 PNR Regional</div>
+        <div class="exec-cell-val" id="exec-pnr">—</div>
+        <div class="exec-cell-sub" id="exec-pnr-sub">—</div>
+      </div>
+      <div class="exec-cell">
+        <div class="exec-cell-label">🚨 Alertas críticos</div>
+        <div class="exec-cell-val" id="exec-alerts">—</div>
+        <div class="exec-cell-sub" id="exec-alerts-sub">rotas exigem ação</div>
+      </div>
+    </div>
+  </div>
+
   <!-- KPIs Consolidados -->
   <div class="kpi-grid" id="geralKpiGrid">
     <div class="kpi"><div class="k-label">Operações ativas</div><div class="k-val" id="g-ops">—</div><div class="k-sub">de 13</div></div>
@@ -793,6 +905,31 @@ tr.total-row td{border-top:2px solid #90a4ae;font-size:11px;color:var(--blue);}
           <tr><td colspan="10" class="geral-empty">Carregando dados de todas as operações…</td></tr>
         </tbody>
       </table>
+    </div>
+  </div>
+
+  <!-- PNR Consolidado por Operação — visão de Pendências de Não Reconhecimento -->
+  <div class="geral-pnr-card">
+    <div class="geral-pnr-header">
+      <h3>📞 PNR — Visão por Operação</h3>
+      <div class="geral-pnr-subtitle">Pendências de Não Reconhecimento consolidadas por base (Abertas · Resolvidas · Taxa)</div>
+    </div>
+    <div class="geral-pnr-totals">
+      <div class="geral-pnr-total">
+        <div class="gpt-label">⚡ Total Abertas</div>
+        <div class="gpt-val" id="gpnr-total-abertas">0</div>
+      </div>
+      <div class="geral-pnr-total resolvidas">
+        <div class="gpt-label">✅ Total Resolvidas</div>
+        <div class="gpt-val" id="gpnr-total-resolvidas">0</div>
+      </div>
+      <div class="geral-pnr-total taxa">
+        <div class="gpt-label">📊 Taxa Regional</div>
+        <div class="gpt-val" id="gpnr-total-taxa">—</div>
+      </div>
+    </div>
+    <div class="geral-pnr-grid" id="geralPnrGrid">
+      <div class="ovx-empty">Aguardando dados das operações…</div>
     </div>
   </div>
 </div>
@@ -2053,6 +2190,12 @@ function getPnrLog() {
 }
 function setPnrLog(log) {
   try { localStorage.setItem(pnrLogKey(), JSON.stringify(log)); } catch(e) {}
+  // Sincroniza no Firebase para que a Geral consolide dados de todos os operadores
+  if (db && currentOperation !== 'GERAL' && currentOperation !== 'HISTORICO') {
+    const today = new Date().toISOString().slice(0,10);
+    const pfx = currentOperation.toLowerCase().replace(/[^a-z0-9]/g,'_');
+    db.ref(pfx + '/pnrLog/' + today).set(log).catch(e => console.error('writePnrLog:', e));
+  }
 }
 // Compara drivers atuais com o log salvo e atualiza abertura/resolução
 function syncPnrLog() {
@@ -3235,17 +3378,27 @@ let geralListenersAttached = false;
 function attachGeralListeners() {
   if (!db || geralListenersAttached) return;
   geralListenersAttached = true;
+  const today = new Date().toISOString().slice(0,10);
   OPERATIONS.forEach(op => {
     const pfx = op.toLowerCase().replace(/[^a-z0-9]/g,'_');
+    // Listener principal — drivers + extras
     db.ref(pfx + '/currentData').on('value', snap => {
       const data = snap.val();
+      const existing = geralCache[op] || {};
       geralCache[op] = data ? {
         drivers: data.drivers || [],
         extras:  data.extras  || {},
         updatedAt: data.updatedAt || null,
         updatedBy: data.updatedBy || '',
-      } : { drivers: [], extras: {}, updatedAt: null, updatedBy: '' };
-      // Re-renderiza apenas se estamos olhando a GERAL agora
+        pnrLog: existing.pnrLog || {},
+      } : { drivers: [], extras: {}, updatedAt: null, updatedBy: '', pnrLog: existing.pnrLog || {} };
+      if (currentOperation === 'GERAL') renderGeralView();
+    });
+    // Listener do PNR log do dia — atualiza quando qualquer operador resolve/abre PNR
+    db.ref(pfx + '/pnrLog/' + today).on('value', snap => {
+      const log = snap.val() || {};
+      if (!geralCache[op]) geralCache[op] = { drivers: [], extras: {}, updatedAt: null, updatedBy: '', pnrLog: {} };
+      geralCache[op].pnrLog = log;
       if (currentOperation === 'GERAL') renderGeralView();
     });
   });
@@ -3253,9 +3406,11 @@ function attachGeralListeners() {
 
 function detachGeralListeners() {
   if (!db) return;
+  const today = new Date().toISOString().slice(0,10);
   OPERATIONS.forEach(op => {
     const pfx = op.toLowerCase().replace(/[^a-z0-9]/g,'_');
     db.ref(pfx + '/currentData').off();
+    db.ref(pfx + '/pnrLog/' + today).off();
   });
   geralListenersAttached = false;
 }
@@ -3306,6 +3461,10 @@ function aggregateOp(op) {
 }
 
 function renderGeralView() {
+  // Executive Overview + PNR consolidado primeiro (com isolamento de erro)
+  try { renderExecutiveOverview(); } catch(e) { console.error('renderExecutiveOverview:', e); }
+  try { renderGeralPnr(); }         catch(e) { console.error('renderGeralPnr:', e); }
+
   const allAggs    = OPERATIONS.map(op => aggregateOp(op));      // 13 sempre
   const withData   = allAggs.filter(a => a.hasData);              // apenas com dados (KPIs/chart)
   // Atualizar texto "última atualização"
@@ -3537,6 +3696,170 @@ function renderHistoricoOverviews() {
   }
   section.style.display = '';
   grid.innerHTML = historicoData.map(renderOverviewMiniCard).join('');
+}
+
+// ═══════════════════════════════════════════════════
+// EXECUTIVE OVERVIEW + GERAL PNR — agregação de todas as operações
+// ═══════════════════════════════════════════════════
+// Calcula estatísticas PNR de UMA operação a partir do cache (drivers + extras + pnrLog)
+function pnrStatsForOp(op) {
+  const data = geralCache[op];
+  if (!data) return { abertas: 0, resolvidas: 0, total: 0, hasData: false };
+  // PNR ativas = rotas com (pnrCount>0) OU (extras[rota].pnr === true)
+  const activeSet = new Set();
+  (data.drivers || []).forEach(d => {
+    const hasAuto   = (d.pnrCount || 0) > 0;
+    const hasManual = !!(data.extras && data.extras[d.rota] && data.extras[d.rota].pnr);
+    if (hasAuto || hasManual) activeSet.add(d.rota);
+  });
+  // Resolvidas = log tem fechadaEm
+  const log = data.pnrLog || {};
+  const rotasLog = Object.keys(log);
+  let resolvidas = 0;
+  rotasLog.forEach(rota => {
+    if (log[rota] && log[rota].fechadaEm) resolvidas++;
+  });
+  return {
+    abertas: activeSet.size,
+    resolvidas,
+    total: activeSet.size + resolvidas,
+    hasData: (data.drivers || []).length > 0 || rotasLog.length > 0,
+  };
+}
+
+// Render do PNR consolidado por operação (todos os mini-cards + totais)
+function renderGeralPnr() {
+  const grid = document.getElementById('geralPnrGrid');
+  if (!grid) return;
+  const setN = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+
+  let totalAbertas = 0, totalResolvidas = 0;
+  const cards = OPERATIONS.map(op => {
+    const stats = pnrStatsForOp(op);
+    totalAbertas    += stats.abertas;
+    totalResolvidas += stats.resolvidas;
+    return { op, stats };
+  });
+
+  const totalGeral = totalAbertas + totalResolvidas;
+  setN('gpnr-total-abertas', totalAbertas);
+  setN('gpnr-total-resolvidas', totalResolvidas);
+  setN('gpnr-total-taxa', totalGeral > 0 ? Math.round(totalResolvidas/totalGeral*100) + '%' : '—');
+
+  // Ordena: críticos (mais abertas) primeiro, depois com dados, depois sem
+  cards.sort((a,b) => {
+    if (a.stats.abertas !== b.stats.abertas) return b.stats.abertas - a.stats.abertas;
+    if (a.stats.hasData !== b.stats.hasData) return b.stats.hasData - a.stats.hasData;
+    return a.op.localeCompare(b.op);
+  });
+
+  grid.innerHTML = cards.map(({op, stats}) => {
+    // Status: CRÍTICO (≥3 abertas), ATENÇÃO (1-2 abertas), OK (0 abertas mas com dados), NONE (sem dados)
+    let statusClass, statusLabel;
+    if (!stats.hasData) { statusClass = 'status-none'; statusLabel = 'sem dados'; }
+    else if (stats.abertas >= 3) { statusClass = 'status-crit'; statusLabel = 'Crítico'; }
+    else if (stats.abertas >= 1) { statusClass = 'status-warn'; statusLabel = 'Atenção'; }
+    else { statusClass = 'status-ok'; statusLabel = 'OK'; }
+
+    const maxBar = Math.max(stats.total, 1);
+    const pctAbertas    = (stats.abertas / maxBar * 100);
+    const pctResolvidas = (stats.resolvidas / maxBar * 100);
+    const taxa = stats.total > 0 ? Math.round(stats.resolvidas / stats.total * 100) : 0;
+    const taxaClass = stats.total === 0 ? '' : (taxa >= 70 ? 'high' : (taxa < 50 ? 'low' : ''));
+
+    // Detecta ciclo pela última atualização (heurística simples)
+    const updatedAt = geralCache[op]?.updatedAt;
+    let ciclo = '—';
+    if (updatedAt) {
+      const h = new Date(updatedAt).getHours();
+      ciclo = h < 13 ? 'AM' : (h < 19 ? 'PM' : 'SD');
+    }
+
+    return `
+      <div class="geral-pnr-op-card ${statusClass}" data-op="${op}" onclick="switchOperationByName('${op}')" title="Abrir operação ${op}">
+        <div class="geral-pnr-op-header">
+          <span class="geral-pnr-op-name">${op}</span>
+          <span class="geral-pnr-ciclo-badge">${ciclo}</span>
+        </div>
+        <div class="geral-pnr-metrics">
+          <div class="geral-pnr-metric abertas">
+            <span class="geral-pnr-metric-val">${stats.abertas}</span>
+            <span class="geral-pnr-metric-label">Abertas</span>
+            <div class="geral-pnr-bar-wrap"><div class="geral-pnr-bar" style="width:${pctAbertas}%"></div></div>
+          </div>
+          <div class="geral-pnr-metric resolvidas">
+            <span class="geral-pnr-metric-val">${stats.resolvidas}</span>
+            <span class="geral-pnr-metric-label">Resolvidas</span>
+            <div class="geral-pnr-bar-wrap"><div class="geral-pnr-bar" style="width:${pctResolvidas}%"></div></div>
+          </div>
+          <div class="geral-pnr-metric taxa">
+            <span class="geral-pnr-metric-val ${taxaClass}">${stats.total > 0 ? taxa + '%' : '—'}</span>
+            <span class="geral-pnr-metric-label">Taxa</span>
+          </div>
+        </div>
+        <div class="geral-pnr-status-pill">${statusLabel}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Render do Executive Overview — KPIs estratégicos
+function renderExecutiveOverview() {
+  const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+  const fmt = n => (n||0).toLocaleString('pt-BR');
+
+  const aggs = OPERATIONS.map(op => aggregateOp(op));
+  const withData = aggs.filter(a => a.hasData);
+
+  set('exec-ops', withData.length);
+
+  const totalSpr = withData.reduce((s,a)=>s+a.spr, 0);
+  const totalOk  = withData.reduce((s,a)=>s+a.ok, 0);
+  const totalRotas = withData.reduce((s,a)=>s+a.rotas, 0);
+  const totalConc  = withData.reduce((s,a)=>s+a.concluidas, 0);
+  const dsRegional = totalSpr > 0 ? (totalOk/totalSpr*100) : 0;
+  set('exec-pacotes', fmt(totalSpr));
+  set('exec-rotas-sub', fmt(totalRotas) + ' rotas no dia');
+  set('exec-ds', dsRegional.toFixed(1).replace('.', ',') + '%');
+  set('exec-progress', totalRotas > 0 ? Math.round(totalConc/totalRotas*100) + '%' : '—');
+  set('exec-progress-sub', totalConc + ' de ' + totalRotas + ' concluídas');
+
+  // Top / Worst performer (por DS, considerando só ops com dados)
+  if (withData.length) {
+    const sorted = [...withData].sort((a,b) => b.ds - a.ds);
+    const top = sorted[0];
+    const worst = sorted[sorted.length - 1];
+    set('exec-best', top.op);
+    set('exec-best-sub', 'DS ' + top.ds.toFixed(1).replace('.', ',') + '% · ' + top.rotas + ' rotas');
+    set('exec-worst', worst.op);
+    set('exec-worst-sub', 'DS ' + worst.ds.toFixed(1).replace('.', ',') + '% · ' + worst.fail + ' falhas');
+  } else {
+    set('exec-best', '—');     set('exec-best-sub', 'sem dados');
+    set('exec-worst', '—');    set('exec-worst-sub', 'sem dados');
+  }
+
+  // PNR regional
+  let pnrAbertas = 0, pnrResolvidas = 0;
+  OPERATIONS.forEach(op => {
+    const s = pnrStatsForOp(op);
+    pnrAbertas    += s.abertas;
+    pnrResolvidas += s.resolvidas;
+  });
+  const pnrTotal = pnrAbertas + pnrResolvidas;
+  set('exec-pnr', pnrAbertas + ' / ' + pnrTotal);
+  set('exec-pnr-sub', pnrTotal > 0 ? Math.round(pnrResolvidas/pnrTotal*100) + '% resolvidas' : 'nenhuma PNR ainda');
+
+  // Alertas críticos (somatório de rotas atrasadas + ambulâncias + sleepovers + pnr abertas)
+  let alerts = 0;
+  OPERATIONS.forEach(op => {
+    const data = geralCache[op];
+    if (!data || !data.drivers) return;
+    data.drivers.forEach(d => {
+      if (d.atrasada || d.ambu || d.status === 'Retorno pausado' || (d.pnrCount||0) > 0) alerts++;
+    });
+  });
+  set('exec-alerts', alerts);
+  set('exec-alerts-sub', alerts === 1 ? 'rota exige ação' : 'rotas exigem ação');
 }
 
 // Helper para clicar em linha do ranking → abrir a operação
