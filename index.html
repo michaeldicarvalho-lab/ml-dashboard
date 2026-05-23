@@ -3253,7 +3253,8 @@ function switchOperation(op, btn) {
   // Toggle visibilidade das views especiais (GERAL/HISTORICO) vs UI normal
   const geralView = document.getElementById('geralView');
   const historicoView = document.getElementById('historicoView');
-  const normalIds = ['guideCard','importCard','kpiGrid','quickviewSection','alertsSection','pausedSection','chartsRow1','chartsRow2','evoCard','falhasCard','tableCard'];
+  // Inclui pnrStatusCard, overviewCard e reportCard para que NÃO apareçam como "fantasmas" na Geral/Histórico
+  const normalIds = ['guideCard','importCard','kpiGrid','quickviewSection','alertsSection','pausedSection','chartsRow1','chartsRow2','evoCard','falhasCard','tableCard','pnrStatusCard','overviewCard','reportCard'];
 
   if (op === 'GERAL') {
     if (geralView) geralView.classList.add('active');
@@ -3294,9 +3295,9 @@ function switchOperation(op, btn) {
   if (geralView) geralView.classList.remove('active');
   if (historicoView) historicoView.classList.remove('active');
   if (firebaseConnected) {
-    // overviewCard e reportCard são gerenciados pelos seus próprios renders (com base em drivers.length),
-    // mas adicionamos aqui para garantir que voltem ao display padrão e a render decida visibilidade
-    ['importCard','kpiGrid','quickviewSection','pausedSection','chartsRow1','chartsRow2','tableCard'].forEach(id => {
+    // Restaura display dos cards que foram ocultados no GERAL/HISTORICO; os renders subsequentes decidem
+    // se ficam visíveis (com dados) ou hidden (sem dados, no caso dos opcionais)
+    ['importCard','kpiGrid','quickviewSection','pausedSection','chartsRow1','chartsRow2','tableCard','pnrStatusCard','overviewCard','reportCard'].forEach(id => {
       const el = document.getElementById(id); if (el) el.style.display = '';
     });
   }
