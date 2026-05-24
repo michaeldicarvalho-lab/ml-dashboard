@@ -1722,6 +1722,9 @@ function listenFirebase() {
     pausedRoutes = data ? Object.entries(data).map(([id, v]) => ({...v, _id: id})) : [];
     renderPausedSection();
   });
+
+  // Listen to PNR log do dia — garante sync entre todos os operadores
+  attachPnrLogListener();
 }
 
 function trackOnlineUsers() {
@@ -2061,7 +2064,17 @@ function loadSampleData(){document.getElementById('rawInput').value=SAMPLE_DATA;
 function updateAll(){
   // Cada render isolado em try/catch — se um falhar, não derruba os outros
   // (assim os cards de Overview e Report sempre conseguem renderizar)
-  const safe = (label, fn) => { try { fn(); } catch(e) { console.error('[updateAll] ' + label + ':', e); } };
+  // Suporta funções async (ex: syncPnrLog) — captura promise rejection também
+  const safe = (label, fn) => {
+    try {
+      const result = fn();
+      if (result && typeof result.catch === 'function') {
+        result.catch(e => console.error('[updateAll-async] ' + label + ':', e));
+      }
+    } catch(e) {
+      console.error('[updateAll] ' + label + ':', e);
+    }
+  };
   safe('syncPnrLog',        syncPnrLog);  // antes dos renders — atualiza log de PNR
   safe('updateKPIs',        updateKPIs);
   safe('renderQuickView',   renderQuickView);
@@ -2261,25 +2274,93 @@ function pnrLogKey() {
   const today = new Date().toISOString().slice(0,10);
   return `pnr_log_${currentOperation}_${today}`;
 }
+
+// Cache em memória — sincronizado com Firebase. Fonte de verdade compartilhada entre todos os operadores.
+// Chave: "{OP}_{YYYY-MM-DD}", valor: { rota: {abertaEm, fechadaEm} }
+let pnrLogCache = {};
+
 function getPnrLog() {
+  // Prefere cache em memória (mais novo, sincronizado com Firebase via listener).
+  // Fallback para localStorage caso o listener ainda não tenha disparado (offline ou primeiro acesso).
+  if (currentOperation === 'GERAL' || currentOperation === 'HISTORICO') return {};
+  const today = new Date().toISOString().slice(0,10);
+  const cacheKey = `${currentOperation}_${today}`;
+  if (pnrLogCache[cacheKey]) return JSON.parse(JSON.stringify(pnrLogCache[cacheKey])); // deep copy
   try {
     return JSON.parse(localStorage.getItem(pnrLogKey()) || '{}');
   } catch(e) { return {}; }
 }
+
 function setPnrLog(log) {
+  // Salva em localStorage (cache offline) E em Firebase (fonte de verdade compartilhada)
   try { localStorage.setItem(pnrLogKey(), JSON.stringify(log)); } catch(e) {}
-  // Sincroniza no Firebase para que a Geral consolide dados de todos os operadores
   if (db && currentOperation !== 'GERAL' && currentOperation !== 'HISTORICO') {
     const today = new Date().toISOString().slice(0,10);
     const pfx = currentOperation.toLowerCase().replace(/[^a-z0-9]/g,'_');
+    const cacheKey = `${currentOperation}_${today}`;
+    pnrLogCache[cacheKey] = log; // atualiza cache em memória
     db.ref(pfx + '/pnrLog/' + today).set(log).catch(e => console.error('writePnrLog:', e));
   }
 }
-// Compara drivers atuais com o log salvo e atualiza abertura/resolução
-function syncPnrLog() {
+
+// Listener Firebase para o pnrLog da operação atual — garante sincronização entre todos os operadores.
+// Sempre que outro operador atualizar o log, este browser recebe a atualização em tempo real.
+let pnrLogListenerOp = null; // qual op tem listener ativo (para detach correto)
+function attachPnrLogListener() {
+  if (!db) return;
+  if (currentOperation === 'GERAL' || currentOperation === 'HISTORICO') return;
+  // Detach do anterior (se houver) antes de attach do novo
+  detachPnrLogListener();
+  const today = new Date().toISOString().slice(0,10);
+  const pfx = currentOperation.toLowerCase().replace(/[^a-z0-9]/g,'_');
+  const cacheKey = `${currentOperation}_${today}`;
+  pnrLogListenerOp = currentOperation;
+  db.ref(pfx + '/pnrLog/' + today).on('value', snap => {
+    const log = snap.val() || {};
+    pnrLogCache[cacheKey] = log;
+    // Sincroniza localStorage para acesso offline
+    try { localStorage.setItem(`pnr_log_${currentOperation}_${today}`, JSON.stringify(log)); } catch(e) {}
+    // Re-renderiza o card de PNR (pega valores atualizados)
+    try { renderPnrStatusCard(); } catch(e) {}
+    // Re-renderiza Visão Rápida para atualizar badges "PNR resolvida"
+    try { renderQuickView(); } catch(e) {}
+  });
+}
+function detachPnrLogListener() {
+  if (!db || !pnrLogListenerOp) return;
+  const today = new Date().toISOString().slice(0,10);
+  const pfx = pnrLogListenerOp.toLowerCase().replace(/[^a-z0-9]/g,'_');
+  try { db.ref(pfx + '/pnrLog/' + today).off(); } catch(e) {}
+  pnrLogListenerOp = null;
+}
+// Compara drivers atuais com o log salvo e atualiza abertura/resolução.
+// ASYNC porque faz read fresh do Firebase antes de modificar — evita race condition
+// onde dois operadores em browsers diferentes sobrescreveriam o log um do outro.
+async function syncPnrLog() {
   if (!drivers || !drivers.length) return;
   if (currentOperation === 'GERAL' || currentOperation === 'HISTORICO') return;
-  const log = getPnrLog();
+
+  // PASSO 1: SEMPRE buscar versão mais recente do Firebase ANTES de modificar
+  // (garante que o merge não vai sobrescrever resolvidas que outro operador registrou)
+  const today    = new Date().toISOString().slice(0,10);
+  const cacheKey = `${currentOperation}_${today}`;
+  let existingLog = {};
+  if (db) {
+    try {
+      const pfx = currentOperation.toLowerCase().replace(/[^a-z0-9]/g,'_');
+      const snap = await db.ref(pfx + '/pnrLog/' + today).once('value');
+      existingLog = snap.val() || {};
+      pnrLogCache[cacheKey] = existingLog; // atualiza cache em memória
+    } catch(e) {
+      console.warn('[syncPnrLog] erro lendo Firebase, usando cache local:', e);
+      existingLog = pnrLogCache[cacheKey] || getPnrLog();
+    }
+  } else {
+    existingLog = getPnrLog();
+  }
+
+  // PASSO 2: MERGE — preserva tudo que já estava, adiciona novas, marca resolvidas
+  const log = {...existingLog};
   const now = Date.now();
   // Mapa de rotas que TEM PNR ativa agora (auto OU manual)
   const currentActive = new Set();
@@ -2288,15 +2369,12 @@ function syncPnrLog() {
     const hasManual = !!(extras[d.rota] && extras[d.rota].pnr);
     if (hasAuto || hasManual) currentActive.add(d.rota);
   });
-  // Para cada rota com PNR ativa agora, abre se ainda não estava
+  // Abre novas, reabre se necessário (mantém abertaEm original)
   currentActive.forEach(rota => {
     if (!log[rota]) log[rota] = { abertaEm: now, fechadaEm: null };
-    else if (log[rota].fechadaEm) {
-      // Reabriu! Limpa fechadaEm
-      log[rota].fechadaEm = null;
-    }
+    else if (log[rota].fechadaEm) log[rota].fechadaEm = null; // reabriu
   });
-  // Para cada rota que JÁ estava aberta no log mas NÃO está mais ativa, marca fechadaEm
+  // Marca como resolvida quem estava aberta e sumiu (preserva abertaEm)
   Object.keys(log).forEach(rota => {
     if (log[rota] && !log[rota].fechadaEm && !currentActive.has(rota)) {
       log[rota].fechadaEm = now;
@@ -3245,6 +3323,7 @@ function switchOperation(op, btn) {
       db.ref(oldPfx + '/snapshots').off();
       db.ref(oldPfx + '/paused').off();
       db.ref(oldPfx + '/online').off();
+      detachPnrLogListener(); // detach pnrLog do op anterior
     }
   }
 
