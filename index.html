@@ -1697,7 +1697,7 @@ function listenFirebase() {
   db.ref(currentOperation.toLowerCase().replace(/[^a-z0-9]/g,'_') + '/currentData').on('value', snap => {
     const data = snap.val();
     if (!data) return;
-    drivers = data.drivers || [];
+    drivers = sanitizeDriversNames(data.drivers || []); // limpa nomes ruins (Kangu, Logistics, etc) vindos do Firebase
     extras = data.extras || {};
     const now = new Date();
     document.getElementById('headerMeta').textContent =
@@ -1811,6 +1811,43 @@ function set(id,val){const el=document.getElementById(id);if(el)el.textContent=v
 function showStatus(msg,type){const el=document.getElementById('parseStatus');el.textContent=msg;el.className=type;}
 
 // ═══════════════════════════════════════════════════
+// NOT_NAME — lista global de palavras/padrões que NUNCA são nomes de motoristas
+// Usada pelo parser E pelo sanitizador de runtime (limpa dados antigos do Firebase).
+// ═══════════════════════════════════════════════════
+const NOT_NAME_GLOBAL = new RegExp([
+  // Status e indicadores Meli
+  'utilit[aá]rios?','DCG','SDD-','SDD$','BRN','SSP\\d','AM\\d','PM\\d','SD$','MLP','Walker',
+  'Planejado','Executado','Conclu','andamento','caminho','pausado','atrasada','prestes',
+  'ambul[âa]ncia','paradas?','comerciais?','residenciais?','unidades?','fora\\s+da','retorno',
+  'NEx','BRNSP','BRDSP','fast','promessa','passeio','CPT:','Hoje',
+  // Tipos de veículo
+  'Moto\\s+ME','Veiculo','VUC(\\s+SDD)?','SDD$','ME\\s+Extra','Passeio\\s+Extra',
+  // Empresas / DSPs parceiras (logísticas) — comuns no Mercado Envios
+  '\\bKangu\\b','Loggi','Sequoia','Jadlog','Total\\s+Express','JT\\s+Express',
+  'Mandae','Direct(\\s+Log)?','Azul\\s+Cargo','TNT','Correios','J&T','SHEIN',
+  // Termos genéricos de logística (em PT e EN)
+  '\\bLogistics?\\b','\\bExpress\\b','\\bCargo\\b','Transporte','Service\\s+Center','\\bHub\\b',
+  // Qualquer linha que comece com número
+  '^\\d',
+].join('|'), 'i');
+
+// SANITIZADOR DE NOMES — limpa dados ruins que possam estar no Firebase (escritos por parser antigo)
+// Aplica nas listas de drivers SEMPRE antes de renderizar.
+function sanitizeDriversNames(driversArr) {
+  if (!driversArr || !Array.isArray(driversArr)) return driversArr;
+  let cleaned = 0;
+  driversArr.forEach(d => {
+    if (d && d.nome && NOT_NAME_GLOBAL.test(d.nome)) {
+      // Nome é uma empresa/categoria, substitui pelo código da rota (ou — se rota também vazia)
+      d.nome = d.rota || '—';
+      cleaned++;
+    }
+  });
+  if (cleaned > 0) console.log('[sanitizeDriversNames] ' + cleaned + ' nome(s) limpos (ex: Kangu Logistics → código da rota)');
+  return driversArr;
+}
+
+// ═══════════════════════════════════════════════════
 // PARSER
 // ═══════════════════════════════════════════════════
 function parseText(raw){
@@ -1853,24 +1890,8 @@ function parseText(raw){
 
   const NOISE = /^(SPR|OZH|ORH|MLP|Walker|toc|icon-|CHEVRON|pending|warning|incident|stem|percurso|transferiu|recebeu|ver\s+detalhe|ver\s+rutas|esconder|filtros|performance|searchbox|procurar|monitoramento|esta[çc][aã]o|equipes|externas|seguran[çc]a|mercadoenvios|\+\d+|você\s+está|rotas\s+totais|de\s+entrega|de\s+coleta|mistas|em\s+andamento|pacotes|sacas|pendentes|com\s+falhas|bem-sucedidos|veículos|com\s+entregas|alertas?\s+ativos?|incidências|histórico|não\s+há\s+alertas?|esta\s+rota|fast\s+promise|promessa\s+fast|cpt\s+past)/i;
   const SKIP = new Set(['SPR','OZH','ORH','MLP','Walker','toc','-','1','2','3','4','5','6','7','8','9','0','100']);
-  // Lista de palavras/padrões que NUNCA são nomes de motoristas (evita falso positivo)
-  // Categorias: status, tipos de veículo, agências, empresas/DSPs parceiras, abreviações Meli
-  const NOT_NAME = new RegExp([
-    // Status e indicadores Meli
-    'utilit[aá]rios?','DCG','SDD-','SDD$','BRN','SSP\\d','AM\\d','PM\\d','SD$','MLP','Walker',
-    'Planejado','Executado','Conclu','andamento','caminho','pausado','atrasada','prestes',
-    'ambul[âa]ncia','paradas?','comerciais?','residenciais?','unidades?','fora\\s+da','retorno',
-    'NEx','BRNSP','BRDSP','fast','promessa','passeio','CPT:','Hoje',
-    // Tipos de veículo
-    'Moto\\s+ME','Veiculo','VUC(\\s+SDD)?','SDD$','ME\\s+Extra','Passeio\\s+Extra',
-    // Empresas / DSPs parceiras (logísticas) — comuns no Mercado Envios
-    'Kangu(\\s+Logistics)?','Loggi','Sequoia','Jadlog','Total\\s+Express','JT\\s+Express',
-    'Mandae','Direct(\\s+Log)?','Azul\\s+Cargo','TNT','Correios','J&T','SHEIN',
-    // Termos genéricos de logística (em PT e EN)
-    'Logistics?','Express','Cargo','Transporte','Service\\s+Center','Hub',
-    // Qualquer linha que comece com número
-    '^\\d',
-  ].join('|'), 'i');
+  // Usa NOT_NAME_GLOBAL (escopo global) — mesma regex é usada pelo sanitizador de runtime
+  const NOT_NAME = NOT_NAME_GLOBAL;
 
   const results = [];
 
@@ -2038,7 +2059,7 @@ function importData(){
   if(!raw){showStatus('Cole os dados antes de importar.','err');return;}
   const parsed=parseText(raw);
   if(!parsed.length){showStatus('Nenhum motorista encontrado. Verifique o formato.','err');return;}
-  drivers=parsed;
+  drivers=sanitizeDriversNames(parsed); // dupla checagem após parse (defensivo)
   const now=new Date();
   const label=now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
   const totalOk=parsed.reduce((s,d)=>s+d.ok,0);
@@ -3395,7 +3416,7 @@ function switchOperation(op, btn) {
   if (sb) sb.value = '';
 
   // Restore saved state for new op
-  drivers       = [...(opState[op].drivers || [])];
+  drivers       = sanitizeDriversNames([...(opState[op].drivers || [])]);
   extras        = {...(opState[op].extras  || {})};
   snapshots     = [...(opState[op].snapshots || [])];
   pausedRoutes  = [...(opState[op].pausedRoutes || [])];
