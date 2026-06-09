@@ -369,6 +369,9 @@ textarea#rawInput:focus{outline:2px solid var(--blue-mid);border-color:transpare
 .qv-time-item.alert.urgente .qv-time-val{color:#e65100;}
 .qv-time-item.alert.critico .qv-time-val{color:#b71c1c;}
 .qv-time-item.alert.estourado .qv-time-val{color:#7f0000;animation:flashPNR 1.2s infinite;}
+/* Stem Out PROXY (calculado via ORH-OZH) — visual mais discreto que real */
+.qv-time-item.proxy .qv-time-val{font-style:italic;opacity:.85;border-bottom:1px dotted currentColor;cursor:help;}
+.qv-time-item.proxy .qv-time-label{color:var(--blue);opacity:.75;}
 [data-theme="dark"] .qv-times{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08);}
 
 /* Badges de alerta de tempo (texto explicativo) */
@@ -1860,6 +1863,40 @@ function stemOutAlertLevel(stemStr) {
   if (h >  1.5)  return { level: 'atencao', color: '#e65100', label: '⚠ Deslocamento longo — verificar', alert: true };
   return { level: 'normal', color: 'var(--text3)', label: '', alert: false };
 }
+
+// Helper: converte horas decimais (ex: 1.75) para "HH:MM" (ex: "01:45")
+function hrsToTime(h) {
+  if (!h || h <= 0) return '—';
+  const totalMin = Math.round(h * 60);
+  const hh = Math.floor(totalMin / 60);
+  const mm = totalMin % 60;
+  return String(hh).padStart(2,'0') + ':' + String(mm).padStart(2,'0');
+}
+
+// Retorna informação de Stem Out — usa valor real se disponível, senão calcula proxy via ORH-OZH
+// Lógica do proxy: (ORH - OZH) = tempo TOTAL fora da zona (ida + volta + transições entre paradas)
+// Aproximamos Stem Out (apenas IDA) como ~55% do total fora da zona (ida geralmente > volta)
+function getStemOutInfo(d) {
+  // Preferência 1: valor REAL parseado do Meli (vista expandida)
+  if (d.stemOut && d.stemOut !== '—') {
+    return { value: d.stemOut, isProxy: false, hours: timeToHrs(d.stemOut), source: 'real' };
+  }
+  // Preferência 2: proxy calculado (ORH - OZH) × 0.55
+  const orhH = timeToHrs(d.orhExec);
+  const ozhH = timeToHrs(d.ozh);
+  if (orhH > 0 && ozhH > 0 && orhH > ozhH) {
+    const diffH = orhH - ozhH;            // tempo total fora da zona
+    const proxyH = diffH * 0.55;          // aproximação da componente Stem Out
+    return {
+      value: hrsToTime(proxyH),
+      isProxy: true,
+      hours: proxyH,
+      diffTotal: hrsToTime(diffH),
+      source: 'proxy'
+    };
+  }
+  return { value: '—', isProxy: false, hours: 0, source: 'none' };
+}
 function toTitleCase(str){
   const mi=['de','da','do','das','dos','e','a','o'];
   return(str||'').toLowerCase().split(' ').map((w,i)=>
@@ -2865,7 +2902,9 @@ function renderQuickView(){
     const pnrRecentResolved = !pnrActive && pnrRecentlyResolved(d.rota);
     // Avalia alertas de ORH (horas em rota) e Stem Out (deslocamento até 1ª entrega)
     const orhInfo  = orhAlertLevel(d.orhExec);
-    const stemInfo = stemOutAlertLevel(d.stemOut);
+    // Stem Out: usa valor real OU proxy (ORH-OZH)×0.55 quando texto não traz Stem Out
+    const stemData = getStemOutInfo(d);
+    const stemInfo = stemOutAlertLevel(stemData.value);
     let badges=[];
     if(d.atrasada)badges.push(`<span class="badge badge-red">Atrasada</span>`);
     if(pnrActive)badges.push(`<span class="badge badge-pink-pnr">⚡ PNR ATIVA${(d.pnrCount||0)>1 ? ' ('+d.pnrCount+')' : ''}</span>`);
@@ -2873,7 +2912,10 @@ function renderQuickView(){
     if(d.ambu)badges.push(`<span class="badge badge-ambu">🚑 ${d.ambuCount||1} ambul.</span>`);
     // Alertas de tempo (visíveis quando ORH ≥ 9h ou Stem Out > 1:30)
     if(orhInfo.alert) badges.push(`<span class="badge badge-orh-alert ${orhInfo.level}" title="ORH atual: ${d.orhExec}">${orhInfo.label}</span>`);
-    if(stemInfo.alert) badges.push(`<span class="badge badge-stem-alert ${stemInfo.level}" title="Stem Out atual: ${d.stemOut}">${stemInfo.label}</span>`);
+    if(stemInfo.alert) {
+      const stemSrcLabel = stemData.isProxy ? ` (aprox. via ORH-OZH)` : '';
+      badges.push(`<span class="badge badge-stem-alert ${stemInfo.level}" title="Stem Out${stemData.isProxy ? ' aproximado' : ''}: ${stemData.value}${stemData.isProxy ? ' (~' + stemData.diffTotal + ' total fora da zona)' : ''}">${stemInfo.label}${stemSrcLabel}</span>`);
+    }
     if(d.status==='Retorno pausado')badges.push(`<span class="badge badge-sleepover">⏸ SLEEPOVER · 10h SC</span>`);
     if(d.fail>0)badges.push(`<span class="badge badge-red">${d.fail} falha(s)</span>`);
     if(d.status==='Concluída')badges.push(`<span class="badge badge-blue">✓</span>`);
@@ -2902,21 +2944,27 @@ function renderQuickView(){
         <span class="qv-adr-pct">${comerPct.toFixed(0)}% com</span>
       </div>`;
     }
-    // Bloco de tempos — ORH (horas em rota) e Stem Out (deslocamento até 1ª entrega)
+    // Bloco de tempos — ORH (horas em rota) e Stem Out (real OU proxy ORH-OZH)
     let timesHtml = '';
     const hasOrh  = d.orhExec && d.orhExec !== '—';
-    const hasStem = d.stemOut && d.stemOut !== '—';
+    const hasStem = stemData.value !== '—';
     if (hasOrh || hasStem) {
       const orhCellCls  = orhInfo.alert  ? `alert ${orhInfo.level}`  : '';
       const stemCellCls = stemInfo.alert ? `alert ${stemInfo.level}` : '';
+      // Marcação visual quando é proxy (calculado, não real)
+      const stemPrefix = stemData.isProxy ? '~' : '';
+      const stemProxyCls = stemData.isProxy ? ' proxy' : '';
+      const stemTitle = stemData.isProxy
+        ? `Stem Out APROXIMADO — calculado via (ORH - OZH) × 0.55. Deslocamento total fora da zona: ${stemData.diffTotal}. Para valor exato, copie a vista expandida do Meli.`
+        : `Stem Out REAL — deslocamento do CD até a 1ª entrega`;
       timesHtml = `<div class="qv-times">
         ${hasOrh ? `<div class="qv-time-item ${orhCellCls}" title="ORH: tempo total em rota (limite 12h)">
           <span class="qv-time-label">⏱ ORH</span>
           <span class="qv-time-val">${d.orhExec}</span>
         </div>` : ''}
-        ${hasStem ? `<div class="qv-time-item ${stemCellCls}" title="Stem Out: deslocamento do CD até a 1ª entrega">
-          <span class="qv-time-label">🚚 Stem Out</span>
-          <span class="qv-time-val">${d.stemOut}</span>
+        ${hasStem ? `<div class="qv-time-item ${stemCellCls}${stemProxyCls}" title="${stemTitle}">
+          <span class="qv-time-label">🚚 Stem Out${stemData.isProxy ? ' ~' : ''}</span>
+          <span class="qv-time-val">${stemPrefix}${stemData.value}</span>
         </div>` : ''}
       </div>`;
     }
