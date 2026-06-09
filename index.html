@@ -349,6 +349,36 @@ textarea#rawInput:focus{outline:2px solid var(--blue-mid);border-color:transpare
 .qv-card.has-pnr{border:2px solid #c2185b!important;box-shadow:0 0 0 2px rgba(194,24,91,.2);animation:pulsePNR 1.8s infinite;}
 @keyframes pulsePNR{0%,100%{box-shadow:0 0 0 2px rgba(194,24,91,.2);}50%{box-shadow:0 0 0 5px rgba(194,24,91,.45);}}
 .qv-badges .badge-pink-pnr{background:#c2185b;color:#fff;font-weight:700;animation:flashPNR 1.2s infinite;padding:3px 8px;}
+/* Card com ORH em alerta (9h+ em rota) — pulsa em amber/laranja/vermelho */
+.qv-card.has-orh-alert{border:2px solid #bf360c!important;box-shadow:0 0 0 2px rgba(191,54,12,.2);}
+.qv-card.has-orh-alert.orh-urgente{border-color:#e65100!important;box-shadow:0 0 0 2px rgba(230,81,0,.25);}
+.qv-card.has-orh-alert.orh-critico{border-color:#b71c1c!important;box-shadow:0 0 0 2px rgba(183,28,28,.3);animation:pulseOrh 1.5s infinite;}
+.qv-card.has-orh-alert.orh-estourado{border-color:#7f0000!important;box-shadow:0 0 0 3px rgba(127,0,0,.4);animation:pulseOrh 1s infinite;}
+@keyframes pulseOrh{0%,100%{box-shadow:0 0 0 2px rgba(183,28,28,.3);}50%{box-shadow:0 0 0 7px rgba(183,28,28,.55);}}
+/* Card com Stem Out em alerta (> 1:30) — pulsa em laranja */
+.qv-card.has-stem-alert{border:2px solid #e65100!important;box-shadow:0 0 0 2px rgba(230,81,0,.2);}
+.qv-card.has-stem-alert.stem-critico{border-color:#b71c1c!important;animation:pulseStem 1.8s infinite;}
+@keyframes pulseStem{0%,100%{box-shadow:0 0 0 2px rgba(230,81,0,.2);}50%{box-shadow:0 0 0 6px rgba(230,81,0,.5);}}
+/* Bloco de tempos (ORH + Stem Out) abaixo do bar de progresso */
+.qv-times{display:flex;gap:8px;margin-top:5px;padding:5px 7px;border-radius:5px;background:rgba(0,0,0,.03);border:1px solid rgba(0,0,0,.05);font-size:10px;}
+.qv-time-item{display:flex;flex-direction:column;flex:1;gap:1px;}
+.qv-time-item .qv-time-label{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--text3);}
+.qv-time-item .qv-time-val{font-size:12px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;}
+.qv-time-item.alert .qv-time-val{font-weight:800;}
+.qv-time-item.alert.atencao .qv-time-val{color:#bf360c;}
+.qv-time-item.alert.urgente .qv-time-val{color:#e65100;}
+.qv-time-item.alert.critico .qv-time-val{color:#b71c1c;}
+.qv-time-item.alert.estourado .qv-time-val{color:#7f0000;animation:flashPNR 1.2s infinite;}
+[data-theme="dark"] .qv-times{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08);}
+
+/* Badges de alerta de tempo (texto explicativo) */
+.badge-orh-alert{background:linear-gradient(135deg,#bf360c,#7f0000);color:#fff;font-weight:700;padding:3px 8px;font-size:9px;}
+.badge-orh-alert.urgente{background:linear-gradient(135deg,#e65100,#bf360c);}
+.badge-orh-alert.critico{background:linear-gradient(135deg,#b71c1c,#7f0000);animation:flashPNR 1.2s infinite;}
+.badge-orh-alert.estourado{background:#7f0000;animation:flashPNR .9s infinite;}
+.badge-stem-alert{background:linear-gradient(135deg,#e65100,#bf360c);color:#fff;font-weight:700;padding:3px 8px;font-size:9px;}
+.badge-stem-alert.critico{background:linear-gradient(135deg,#b71c1c,#7f0000);animation:flashPNR 1.2s infinite;}
+
 /* Card com ambulância (apoio em andamento) — pulsa em roxo */
 .qv-card.has-ambu{border:2px solid #6a1b9a!important;box-shadow:0 0 0 2px rgba(106,27,154,.18);animation:pulseAmbu 1.8s infinite;}
 @keyframes pulseAmbu{0%,100%{box-shadow:0 0 0 2px rgba(106,27,154,.18);}50%{box-shadow:0 0 0 6px rgba(106,27,154,.4);}}
@@ -1799,6 +1829,37 @@ function pkgPorHoraLabel(v) {
   return v + ' <small style="font-size:9px;font-weight:400">pkg/h</small>';
 }
 function timeToHrs(t){ if(!t||t==='—')return 0; const[h,m]=t.split(':').map(Number); return h+m/60; }
+
+// ═══════════════════════════════════════════════════
+// ALERTAS DE TEMPO — ORH (horas em rota) e Stem Out (deslocamento até 1ª entrega)
+// ═══════════════════════════════════════════════════
+// ORH: máximo permitido 12h. Alerta começa em 9h (3h de janela de ação para apoio/ambulância)
+//   - < 9h    → normal (cinza)
+//   - 9-10h   → atenção (amber) — alerta começa
+//   - 10-11h  → urgente (laranja)
+//   - 11-12h  → crítico (vermelho) — última hora
+//   - >= 12h  → ESTOUROU (vermelho escuro pulsante)
+function orhAlertLevel(orhStr) {
+  const h = timeToHrs(orhStr);
+  if (h <= 0) return { level: 'none', color: 'var(--text3)', label: '—', alert: false };
+  if (h >= 12)  return { level: 'estourado', color: '#7f0000', label: '🚨 ORH ESTOUROU', alert: true, pulse: true };
+  if (h >= 11)  return { level: 'critico',   color: '#b71c1c', label: '⛔ Crítico — 1h pra estourar', alert: true, pulse: true };
+  if (h >= 10)  return { level: 'urgente',   color: '#e65100', label: '⚠ Urgente — 2h pra estourar', alert: true };
+  if (h >= 9)   return { level: 'atencao',   color: '#bf360c', label: '⏰ Atenção — buscar apoio', alert: true };
+  return { level: 'normal', color: 'var(--text3)', label: '', alert: false };
+}
+
+// Stem Out: tempo do CD até a 1ª entrega. Alerta acima de 1:30
+//   - <= 1:30 → normal
+//   - > 1:30   → atenção (algo aconteceu no deslocamento)
+//   - > 2:00   → crítico (investigar)
+function stemOutAlertLevel(stemStr) {
+  const h = timeToHrs(stemStr);
+  if (h <= 0) return { level: 'none', color: 'var(--text3)', label: '—', alert: false };
+  if (h >= 2)    return { level: 'critico', color: '#b71c1c', label: '🚨 Stem Out crítico — investigar', alert: true, pulse: true };
+  if (h >  1.5)  return { level: 'atencao', color: '#e65100', label: '⚠ Deslocamento longo — verificar', alert: true };
+  return { level: 'normal', color: 'var(--text3)', label: '', alert: false };
+}
 function toTitleCase(str){
   const mi=['de','da','do','das','dos','e','a','o'];
   return(str||'').toLowerCase().split(' ').map((w,i)=>
@@ -1951,6 +2012,10 @@ function parseText(raw){
     // ORH Exec/Plan: "Executado 03:11hs Planejado 03:35hs"
     const execM = block.match(/Executado\s+(\d{1,2}:\d{2})\s*hs?/i);
     const planM = block.match(/Planejado\s+(\d{1,2}:\d{2})\s*hs?/i);
+    // Stem Out: tempo de deslocamento do CD até a primeira entrega — "Stem Out\n00:58 h"
+    const stemOutM = block.match(/Stem\s*Out[\s\S]{0,60}?(\d{1,2}:\d{2})\s*h\b/i);
+    // Stem In: tempo de retorno (não usado por alerta hoje, capturamos para futuro)
+    const stemInM  = block.match(/Stem\s*In[\s\S]{0,60}?(\d{1,2}:\d{2})\s*h\b/i);
 
     let nome = '';
     for(const line of bLines){
@@ -2033,6 +2098,8 @@ function parseText(raw){
       ozh:     ozhM  ? ozhM[1]  : '—',
       orhExec: execM ? execM[1] : '—',
       orhPlan: planM ? planM[1] : '—',
+      stemOut: stemOutM ? stemOutM[1] : '—',
+      stemIn:  stemInM  ? stemInM[1]  : '—',
       status, atrasada, fechando, ambu, ambuCount, pnrCount, pnrAuto,
       foraArea: foraM ? +foraM[1] : 0,
       isNex: isNexRoute,
@@ -2797,10 +2864,17 @@ function renderQuickView(){
     const pnrActive = ((d.pnrCount || 0) > 0) || !!ex.pnr;
     const pnrRecentResolved = !pnrActive && pnrRecentlyResolved(d.rota);
     let badges=[];
+    // Avalia alertas de ORH (horas em rota) e Stem Out (deslocamento até 1ª entrega)
+    const orhInfo  = orhAlertLevel(d.orhExec);
+    const stemInfo = stemOutAlertLevel(d.stemOut);
+    let badges=[];
     if(d.atrasada)badges.push(`<span class="badge badge-red">Atrasada</span>`);
     if(pnrActive)badges.push(`<span class="badge badge-pink-pnr">⚡ PNR ATIVA${(d.pnrCount||0)>1 ? ' ('+d.pnrCount+')' : ''}</span>`);
     else if(pnrRecentResolved)badges.push(`<span class="badge badge-pnr-resolved">✅ PNR resolvida</span>`);
     if(d.ambu)badges.push(`<span class="badge badge-ambu">🚑 ${d.ambuCount||1} ambul.</span>`);
+    // Alertas de tempo (visíveis quando ORH ≥ 9h ou Stem Out > 1:30)
+    if(orhInfo.alert) badges.push(`<span class="badge badge-orh-alert ${orhInfo.level}" title="ORH atual: ${d.orhExec}">${orhInfo.label}</span>`);
+    if(stemInfo.alert) badges.push(`<span class="badge badge-stem-alert ${stemInfo.level}" title="Stem Out atual: ${d.stemOut}">${stemInfo.label}</span>`);
     if(d.status==='Retorno pausado')badges.push(`<span class="badge badge-sleepover">⏸ SLEEPOVER · 10h SC</span>`);
     if(d.fail>0)badges.push(`<span class="badge badge-red">${d.fail} falha(s)</span>`);
     if(d.status==='Concluída')badges.push(`<span class="badge badge-blue">✓</span>`);
@@ -2808,6 +2882,8 @@ function renderQuickView(){
     const resolvClass = pnrRecentResolved ? ' recently-resolved-pnr' : '';
     const ambuClass   = d.ambu ? ' has-ambu' : '';
     const sleepClass  = d.status === 'Retorno pausado' ? ' has-sleepover' : '';
+    const orhClass    = orhInfo.alert ? ` has-orh-alert orh-${orhInfo.level}` : '';
+    const stemClass   = stemInfo.alert ? ` has-stem-alert stem-${stemInfo.level}` : '';
     // Tag só aparece em sacas em trânsito (cards sem motorista, a caminho do NEx/DC)
     // Cards com motorista (gaiola mãe / nex local) ficam limpos — motorista é o padrão
     let kindTag = '';
@@ -2827,7 +2903,25 @@ function renderQuickView(){
         <span class="qv-adr-pct">${comerPct.toFixed(0)}% com</span>
       </div>`;
     }
-    return `<div class="qv-card${pnrClass}${resolvClass}${ambuClass}${sleepClass}" style="background:${bg};border-color:${bc}">
+    // Bloco de tempos — ORH (horas em rota) e Stem Out (deslocamento até 1ª entrega)
+    let timesHtml = '';
+    const hasOrh  = d.orhExec && d.orhExec !== '—';
+    const hasStem = d.stemOut && d.stemOut !== '—';
+    if (hasOrh || hasStem) {
+      const orhCellCls  = orhInfo.alert  ? `alert ${orhInfo.level}`  : '';
+      const stemCellCls = stemInfo.alert ? `alert ${stemInfo.level}` : '';
+      timesHtml = `<div class="qv-times">
+        ${hasOrh ? `<div class="qv-time-item ${orhCellCls}" title="ORH: tempo total em rota (limite 12h)">
+          <span class="qv-time-label">⏱ ORH</span>
+          <span class="qv-time-val">${d.orhExec}</span>
+        </div>` : ''}
+        ${hasStem ? `<div class="qv-time-item ${stemCellCls}" title="Stem Out: deslocamento do CD até a 1ª entrega">
+          <span class="qv-time-label">🚚 Stem Out</span>
+          <span class="qv-time-val">${d.stemOut}</span>
+        </div>` : ''}
+      </div>`;
+    }
+    return `<div class="qv-card${pnrClass}${resolvClass}${ambuClass}${sleepClass}${orhClass}${stemClass}" style="background:${bg};border-color:${bc}">
       ${kindTag}
       <div class="qv-name">${d.nome}</div>
       <div class="qv-rota">${d.rota} · ${d.ok}/${d.spr}${d.nexAgencia ? ' · '+d.nexAgencia : ''}</div>
@@ -2836,6 +2930,7 @@ function renderQuickView(){
         <span class="qv-pct" style="color:${pc}">${p}%</span>
       </div>
       ${(()=>{const v=pkgPorHora(d);return v?`<div style="font-size:10px;font-weight:700;color:${pkgPorHoraColor(v)};margin-top:3px">⚡ ${v} pkg/h</div>`:''})()}
+      ${timesHtml}
       ${addressesHtml}
       <div class="qv-badges">${badges.join('')||'<span style="font-size:10px;color:var(--text3)">sem alertas</span>'}</div>
     </div>`;
