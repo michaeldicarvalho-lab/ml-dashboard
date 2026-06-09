@@ -2863,7 +2863,6 @@ function renderQuickView(){
     // PNR efetivo: auto-detectado do texto Meli OU marcado manualmente
     const pnrActive = ((d.pnrCount || 0) > 0) || !!ex.pnr;
     const pnrRecentResolved = !pnrActive && pnrRecentlyResolved(d.rota);
-    let badges=[];
     // Avalia alertas de ORH (horas em rota) e Stem Out (deslocamento até 1ª entrega)
     const orhInfo  = orhAlertLevel(d.orhExec);
     const stemInfo = stemOutAlertLevel(d.stemOut);
