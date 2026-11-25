@@ -861,6 +861,455 @@ tr.total-row td{border-top:2px solid #90a4ae;font-size:11px;color:var(--blue);}
 .history-detail-modal table{font-size:11px;}
 /* ── HEADER SUBTITLE ── */
 .op-name-badge{background:rgba(255,255,255,.18);border-radius:5px;padding:1px 8px;font-size:11px;margin-left:8px;font-weight:400;}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   COCKPIT MODE — redesign futurista com paleta Mercado Envios
+   Aplica em CIMA do visual existente. Ativa em dark-mode OU com classe .cockpit
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Tokens corporativos Mercado Livre/Envios ─────────────────────────────── */
+:root{
+  --ml-yellow:#FFE600;      /* Amarelo oficial Mercado Livre */
+  --ml-yellow-dim:#FFD500;  /* Amarelo escurecido para hover */
+  --ml-blue:#3483FA;        /* Azul oficial Mercado Livre/Pago */
+  --ml-blue-deep:#2968C8;   /* Azul escuro para depth */
+  --ml-navy:#1A237E;        /* Azul marinho da Meli (compat) */
+  --mp-green:#00D4AA;       /* Verde Mercado Pago neon */
+  --neon-red:#FF4757;       /* Vermelho alerta vivo */
+  --neon-orange:#FFA502;    /* Laranja warning vivo */
+  --neon-cyan:#00E5FF;      /* Ciano para acentos de scan */
+  --neon-pink:#FF2E7E;      /* Rosa PNR vivo */
+  --glow-strength:0.65;
+}
+[data-theme="dark"]{
+  --bg:#0a1628;                /* Azul-petróleo quase preto */
+  --surface:#0f2038;           /* Superfície 1 */
+  --surface2:#152a45;          /* Superfície 2 */
+  --border:#1e3658;            /* Bordas sutis */
+  --text:#e8f0ff;              /* Texto claro com toque azul */
+  --text2:#8fa8c7;              /* Texto secundário */
+  --text3:#5a7194;              /* Texto terciário */
+}
+
+/* ── Animações cockpit — pulse, shimmer, scan, counter ──────────────────────── */
+@keyframes cockpitPulseGlow{
+  0%,100%{box-shadow:0 0 0 0 rgba(52,131,250,0),0 0 12px rgba(52,131,250,.25);}
+  50%    {box-shadow:0 0 0 4px rgba(52,131,250,.08),0 0 22px rgba(52,131,250,.45);}
+}
+@keyframes cockpitShimmer{
+  0%  {background-position:-200% 0;}
+  100%{background-position:200% 0;}
+}
+@keyframes cockpitScanLine{
+  0%  {transform:translateY(-100%);opacity:0;}
+  10% {opacity:1;}
+  90% {opacity:1;}
+  100%{transform:translateY(100%);opacity:0;}
+}
+@keyframes cockpitCounterUp{
+  0%{transform:translateY(8px) scale(.92);opacity:0;filter:blur(3px);}
+  100%{transform:translateY(0) scale(1);opacity:1;filter:blur(0);}
+}
+@keyframes cockpitBreathe{
+  0%,100%{transform:scale(1);filter:brightness(1);}
+  50%    {transform:scale(1.02);filter:brightness(1.15);}
+}
+@keyframes cockpitCriticalFlash{
+  0%,100%{filter:brightness(1) drop-shadow(0 0 0 transparent);}
+  50%    {filter:brightness(1.3) drop-shadow(0 0 12px currentColor);}
+}
+@keyframes cockpitRotateSlow{
+  from{transform:rotate(0deg);}
+  to{transform:rotate(360deg);}
+}
+@keyframes cockpitHudGradient{
+  0%,100%{background-position:0% 50%;}
+  50%    {background-position:100% 50%;}
+}
+
+/* ── HEADER cockpit — HUD com gradient animado ─────────────────────────────── */
+.header{
+  background:linear-gradient(110deg,#0d1b6e 0%,#1a237e 25%,#1565c0 50%,#1a237e 75%,#0d1b6e 100%);
+  background-size:300% 100%;
+  animation:cockpitHudGradient 12s ease infinite;
+  position:relative;
+  border-bottom:2px solid rgba(255,230,0,.35);
+  box-shadow:0 2px 24px rgba(52,131,250,.35),inset 0 -1px 0 rgba(255,230,0,.12);
+}
+.header::after{
+  content:'';position:absolute;left:0;right:0;bottom:-2px;height:2px;
+  background:linear-gradient(90deg,transparent 0%,var(--ml-yellow) 50%,transparent 100%);
+  opacity:.75;
+  animation:cockpitShimmer 4s linear infinite;
+  background-size:200% 100%;
+}
+.header-title h1{letter-spacing:.3px;text-shadow:0 1px 3px rgba(0,0,0,.4);}
+.op-name-badge{
+  background:linear-gradient(135deg,rgba(255,230,0,.25),rgba(255,230,0,.08));
+  border:1px solid rgba(255,230,0,.4);
+  color:var(--ml-yellow);
+  font-weight:700;
+  padding:2px 10px;
+  box-shadow:0 0 12px rgba(255,230,0,.25);
+}
+.badge-live{
+  background:rgba(0,229,255,.15);
+  border-color:rgba(0,229,255,.4);
+  box-shadow:0 0 10px rgba(0,229,255,.25);
+}
+.dot-live{box-shadow:0 0 8px currentColor;}
+
+/* ── OPERATION TABS — cockpit ─────────────────────────────────────────────── */
+.ops-tabs{
+  background:linear-gradient(180deg,#0a1545 0%,#0d1b6e 100%);
+  box-shadow:inset 0 2px 0 rgba(255,230,0,.15),inset 0 -1px 0 rgba(0,0,0,.4);
+  border-bottom:1px solid rgba(255,230,0,.2);
+}
+.ops-tab{
+  position:relative;
+  transition:all .2s cubic-bezier(.4,0,.2,1);
+}
+.ops-tab:not(.active):hover{
+  background:rgba(255,230,0,.08);
+  color:var(--ml-yellow);
+  transform:translateY(-1px);
+}
+.ops-tab.active{
+  background:#fff;
+  border-bottom:3px solid var(--ml-yellow);
+  box-shadow:0 -3px 14px rgba(255,230,0,.4),inset 0 0 0 1px rgba(21,101,192,.1);
+}
+.ops-tab.active::before{
+  content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:40%;height:2px;background:var(--ml-yellow);
+  box-shadow:0 0 8px var(--ml-yellow);
+}
+.ops-indicator{
+  box-shadow:0 0 6px currentColor;
+  animation:cockpitBreathe 2s ease-in-out infinite;
+}
+.ops-indicator:not(.empty){background:var(--mp-green);box-shadow:0 0 8px var(--mp-green);}
+
+/* ── KPIs cockpit — números luminosos, borda com glow ──────────────────────── */
+.kpi{
+  position:relative;overflow:hidden;
+  background:linear-gradient(135deg,var(--surface) 0%,var(--surface2) 100%);
+  border:1px solid rgba(52,131,250,.18);
+  transition:transform .25s cubic-bezier(.4,0,.2,1),box-shadow .25s,border-color .25s;
+  cursor:default;
+}
+.kpi::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,transparent,var(--ml-blue),var(--ml-yellow),transparent);
+  background-size:200% 100%;
+  opacity:0;transition:opacity .3s;
+  animation:cockpitShimmer 3s linear infinite;
+}
+.kpi:hover{
+  transform:translateY(-3px) scale(1.015);
+  border-color:var(--ml-blue);
+  box-shadow:0 8px 24px rgba(52,131,250,.25),0 0 0 1px rgba(52,131,250,.3);
+}
+.kpi:hover::before{opacity:1;}
+.kpi .k-val{
+  text-shadow:0 0 18px currentColor;
+  filter:brightness(1);
+  transition:filter .2s;
+  animation:cockpitCounterUp .5s ease-out;
+}
+.kpi:hover .k-val{filter:brightness(1.15);}
+.kpi.kpi-green .k-val{color:var(--mp-green);}
+.kpi.kpi-red   .k-val{color:var(--neon-red);}
+.kpi.kpi-amber .k-val{color:var(--neon-orange);}
+.kpi.kpi-blue  .k-val{color:var(--ml-blue);}
+.kpi.kpi-purple .k-val{color:var(--neon-pink);}
+.kpi .k-label{
+  letter-spacing:.08em;
+  font-weight:700;
+  color:var(--text2);
+}
+
+/* KPIs com destaque extremo — vermelho pulsa, verde respira */
+.kpi.kpi-red:not(:hover) .k-val{animation:cockpitCriticalFlash 1.8s ease-in-out infinite;}
+
+/* ── QUICK VIEW CARDS cockpit — depth + glow ───────────────────────────────── */
+.qv-card{
+  position:relative;
+  transition:transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .22s,border-color .22s;
+  will-change:transform;
+  cursor:default;
+}
+/* Dark mode: FORÇA backgrounds escuros nos cards de Visão Rápida sobrepondo o inline style.
+   Usa [style*="#ebcc"] para detectar cada cor do light mode e substituir por escura. */
+[data-theme="dark"] .qv-card{
+  background:linear-gradient(135deg,var(--surface) 0%,var(--surface2) 100%)!important;
+  border:1px solid rgba(52,131,250,.25)!important;
+}
+[data-theme="dark"] .qv-card[style*="f1f8e9"],[data-theme="dark"] .qv-card[style*="a5d6a7"]{
+  background:linear-gradient(135deg,rgba(0,212,170,.14),rgba(0,212,170,.04))!important;
+  border-color:rgba(0,212,170,.4)!important;
+}
+[data-theme="dark"] .qv-card[style*="fff8e1"],[data-theme="dark"] .qv-card[style*="ffcc80"]{
+  background:linear-gradient(135deg,rgba(255,165,2,.14),rgba(255,165,2,.04))!important;
+  border-color:rgba(255,165,2,.4)!important;
+}
+[data-theme="dark"] .qv-card[style*="ffebee"],[data-theme="dark"] .qv-card[style*="ef9a9a"]{
+  background:linear-gradient(135deg,rgba(255,71,87,.14),rgba(255,71,87,.04))!important;
+  border-color:rgba(255,71,87,.4)!important;
+}
+[data-theme="dark"] .qv-card .qv-name{color:var(--text)!important;}
+[data-theme="dark"] .qv-card .qv-rota{color:var(--text2)!important;}
+/* Garante também contraste em light mode do nome e rota */
+.qv-card .qv-name{font-weight:800;}
+/* Sleepover badge — nunca fica difícil de ler */
+.qv-badges .badge-sleepover{text-shadow:0 1px 2px rgba(0,0,0,.4);}
+.qv-card::after{
+  content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(135deg,rgba(255,255,255,.05) 0%,transparent 40%);
+  opacity:0;transition:opacity .25s;
+}
+.qv-card:hover{
+  transform:translateY(-4px) scale(1.02);
+  box-shadow:0 10px 28px rgba(0,0,0,.18),0 0 0 1px rgba(52,131,250,.4);
+  z-index:5;
+}
+.qv-card:hover::after{opacity:1;}
+.qv-card:hover .qv-name{color:var(--ml-blue);}
+.qv-bar-fill{
+  box-shadow:0 0 8px currentColor;
+  position:relative;overflow:hidden;
+  transition:width .6s cubic-bezier(.4,0,.2,1);
+}
+.qv-bar-fill::after{
+  content:'';position:absolute;top:0;left:-50%;right:-50%;bottom:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);
+  animation:cockpitShimmer 2s linear infinite;
+}
+.qv-pct{text-shadow:0 0 6px currentColor;}
+
+/* Cards críticos — PNR, Ambulância, Sleepover, ORH — ganham glow pulsante extra */
+.qv-card.has-pnr{box-shadow:0 0 0 2px rgba(255,46,126,.3),0 0 18px rgba(255,46,126,.35)!important;}
+.qv-card.has-ambu{box-shadow:0 0 0 2px rgba(206,147,216,.4),0 0 20px rgba(156,39,176,.45)!important;}
+.qv-card.has-sleepover{box-shadow:0 0 0 2px rgba(255,165,2,.4),0 0 20px rgba(255,165,2,.4)!important;}
+.qv-card.has-orh-alert.orh-critico,.qv-card.has-orh-alert.orh-estourado{
+  box-shadow:0 0 0 2px rgba(255,71,87,.5),0 0 24px rgba(255,71,87,.5)!important;
+}
+
+/* ── ALERT SECTIONS cockpit — pulse mais vivo ──────────────────────────────── */
+.alert-section{
+  position:relative;overflow:hidden;
+  backdrop-filter:blur(6px);
+}
+.alert-section::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,currentColor,transparent);
+  animation:cockpitShimmer 3s linear infinite;
+  background-size:200% 100%;opacity:.5;
+}
+.alert-section h3{
+  text-shadow:0 0 12px currentColor;
+}
+.alert-count-badge{
+  box-shadow:0 0 12px currentColor;
+  animation:cockpitBreathe 2.2s ease-in-out infinite;
+}
+.alert-card-mini{
+  transition:transform .18s cubic-bezier(.4,0,.2,1),box-shadow .18s,border-left-width .18s;
+  cursor:pointer;
+}
+.alert-card-mini:hover{
+  transform:translateX(3px) scale(1.01);
+  border-left-width:7px;
+}
+.alert-card-mini .alert-metric{
+  text-shadow:0 0 10px currentColor;
+}
+.alert-section.alert-orh .alert-card-mini.estourado .alert-metric,
+.alert-section.alert-pnr-section .alert-metric{
+  animation:cockpitCriticalFlash 1.2s ease-in-out infinite;
+}
+
+/* ── PNR STATUS cockpit ────────────────────────────────────────────────────── */
+.pnr-mini-val{text-shadow:0 0 14px currentColor;}
+.pnr-mini-open.has-open .pnr-mini-val{animation:cockpitCriticalFlash 1.4s ease-in-out infinite;}
+.pnr-bar-fill{box-shadow:0 0 6px currentColor;}
+
+/* ── CHART CARDS — depth cockpit ───────────────────────────────────────────── */
+.chart-card,.evo-card,.falhas-card,.table-card,.overview-card,.report-card,.pnr-status-card{
+  transition:box-shadow .3s,transform .3s;
+}
+.chart-card:hover,.evo-card:hover,.falhas-card:hover{
+  box-shadow:0 8px 24px rgba(52,131,250,.15),0 0 0 1px rgba(52,131,250,.2);
+  transform:translateY(-2px);
+}
+
+/* ── FAB cockpit — flutua com glow ──────────────────────────────────────────── */
+.fab-main{
+  background:linear-gradient(135deg,var(--ml-blue) 0%,var(--ml-navy) 50%,var(--ml-blue-deep) 100%);
+  box-shadow:0 6px 22px rgba(52,131,250,.5),0 0 0 2px rgba(255,230,0,.25);
+  animation:cockpitBreathe 3s ease-in-out infinite;
+}
+.fab-main:hover{
+  animation:none;
+  box-shadow:0 8px 32px rgba(52,131,250,.7),0 0 0 3px var(--ml-yellow);
+}
+
+/* ── BADGE amarelo ML e verdes cockpit ──────────────────────────────────────── */
+.badge{transition:transform .15s,box-shadow .15s;}
+.badge:hover{transform:translateY(-1px) scale(1.05);box-shadow:0 2px 8px currentColor;}
+.badge-green{background:rgba(0,212,170,.15);color:var(--mp-green);border:1px solid rgba(0,212,170,.4);}
+.badge-red{background:rgba(255,71,87,.15);color:var(--neon-red);border:1px solid rgba(255,71,87,.4);}
+.badge-amber{background:rgba(255,165,2,.15);color:var(--neon-orange);border:1px solid rgba(255,165,2,.4);}
+.badge-blue{background:rgba(52,131,250,.15);color:var(--ml-blue);border:1px solid rgba(52,131,250,.4);}
+
+/* ── Status connecting/dot pulse mais vivo ─────────────────────────────────── */
+.dot-live{box-shadow:0 0 10px currentColor;}
+.dot-connecting{box-shadow:0 0 10px #ffcc02;}
+.dot-offline{box-shadow:0 0 10px #ef5350;}
+
+/* ── Scrollbar cockpit (modo dark) ──────────────────────────────────────────── */
+[data-theme="dark"] ::-webkit-scrollbar{width:10px;height:10px;}
+[data-theme="dark"] ::-webkit-scrollbar-track{background:var(--surface);}
+[data-theme="dark"] ::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,var(--ml-blue),var(--ml-navy));
+  border-radius:5px;border:2px solid var(--surface);
+}
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover{background:var(--ml-yellow);}
+
+/* ── Table rows — hover vivo ────────────────────────────────────────────────── */
+tbody tr{transition:background .18s;}
+tbody tr:hover{
+  background:linear-gradient(90deg,rgba(255,230,0,.08),rgba(52,131,250,.06))!important;
+  box-shadow:inset 3px 0 0 var(--ml-yellow);
+}
+
+/* ── Toast — glow cockpit ──────────────────────────────────────────────────── */
+.toast-msg{
+  box-shadow:0 6px 24px rgba(0,0,0,.35),0 0 0 1px currentColor,0 0 20px currentColor;
+}
+
+/* ── ML yellow highlight em KPI de DS ──────────────────────────────────────── */
+.kpi.kpi-purple{position:relative;}
+.kpi.kpi-purple::after{
+  content:'';position:absolute;top:0;right:0;width:4px;height:100%;
+  background:linear-gradient(180deg,var(--ml-yellow),transparent);
+  opacity:.6;
+}
+
+/* ── Respeita reduced-motion do SO ──────────────────────────────────────────── */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:0.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:0.01ms!important;
+  }
+}
+
+/* ── Light mode: cockpit mais sutil (sem perder legibilidade) ───────────────── */
+:root:not([data-theme="dark"]) .kpi .k-val{text-shadow:0 1px 2px rgba(0,0,0,.05);}
+:root:not([data-theme="dark"]) .header{
+  background:linear-gradient(110deg,#1a237e 0%,#283593 25%,#1565c0 50%,#283593 75%,#1a237e 100%);
+  background-size:300% 100%;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PACOTE DE ANIMAÇÕES AVANÇADAS — radar, sonar, confetti, shimmer
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Partículas radar no fundo (apenas dark) ────────────────────────────────── */
+[data-theme="dark"] body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    radial-gradient(circle at 20% 30%,rgba(52,131,250,.04) 0,transparent 40%),
+    radial-gradient(circle at 80% 70%,rgba(255,230,0,.03) 0,transparent 40%),
+    radial-gradient(circle at 50% 50%,rgba(0,212,170,.03) 0,transparent 50%);
+  animation:cockpitRadarSweep 20s ease-in-out infinite;
+}
+[data-theme="dark"] .main,[data-theme="dark"] .header,[data-theme="dark"] .ops-tabs,[data-theme="dark"] .fab-container{position:relative;z-index:1;}
+@keyframes cockpitRadarSweep{
+  0%,100%{opacity:1;transform:scale(1);}
+  50%    {opacity:.7;transform:scale(1.03);}
+}
+
+/* ── SONAR PULSE — anel se expandindo quando passa mouse no KPI ─────────────── */
+.kpi{position:relative;}
+.kpi::after{
+  content:'';position:absolute;top:50%;left:50%;width:10px;height:10px;
+  border-radius:50%;border:2px solid currentColor;
+  opacity:0;pointer-events:none;
+  transform:translate(-50%,-50%) scale(1);
+  color:var(--ml-blue);
+}
+.kpi:hover::after{
+  animation:cockpitSonar 1.2s ease-out infinite;
+}
+@keyframes cockpitSonar{
+  0%  {opacity:.6;transform:translate(-50%,-50%) scale(1);}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(20);}
+}
+
+/* ── CounterUp animado — classe aplicada via JS durante animação ──────────── */
+.k-val.counter-animating{
+  animation:cockpitCounterPop .6s cubic-bezier(.34,1.56,.64,1);
+  display:inline-block;
+}
+@keyframes cockpitCounterPop{
+  0%  {transform:translateY(12px) scale(.75);opacity:0;filter:blur(4px);}
+  60% {transform:translateY(-3px) scale(1.08);opacity:1;filter:blur(0);}
+  100%{transform:translateY(0) scale(1);opacity:1;filter:blur(0);}
+}
+
+/* ── Shimmer reforçado nas barras de progresso ──────────────────────────────── */
+.qv-bar,.pbar{position:relative;overflow:hidden;}
+.qv-bar::before,.pbar::before{
+  content:'';position:absolute;top:0;left:-100%;right:-100%;bottom:0;
+  background:linear-gradient(90deg,transparent 0%,transparent 40%,rgba(255,255,255,.15) 50%,transparent 60%,transparent 100%);
+  animation:cockpitShimmer 2.5s ease-in-out infinite;
+  pointer-events:none;
+  background-size:50% 100%;
+}
+
+/* ── Confetti container ─────────────────────────────────────────────────────── */
+#confettiHost{
+  position:fixed;top:0;left:0;right:0;height:100vh;pointer-events:none;z-index:99999;
+  overflow:hidden;
+}
+.confetti-piece{
+  position:absolute;width:10px;height:14px;top:-20px;
+  opacity:.95;
+  animation:cockpitConfettiFall linear forwards;
+  will-change:transform,opacity;
+}
+@keyframes cockpitConfettiFall{
+  0%  {transform:translateY(-30px) rotate(0deg);opacity:1;}
+  100%{transform:translateY(100vh) rotate(720deg);opacity:0;}
+}
+
+/* ── Status KPI com sucesso — DS% alto ganha glow verde extra ──────────────── */
+.kpi.kpi-purple.ds-perfect .k-val{
+  color:var(--ml-yellow)!important;
+  text-shadow:0 0 24px var(--ml-yellow),0 0 48px rgba(255,230,0,.5);
+  animation:cockpitBreathe 1.5s ease-in-out infinite,cockpitCounterPop .8s cubic-bezier(.34,1.56,.64,1);
+}
+
+/* ── Pulse adicional no header "Conectado" ─────────────────────────────────── */
+.badge-live:has(.dot-live:not(.dot-connecting):not(.dot-offline))::after{
+  content:'';position:absolute;inset:-2px;border-radius:99px;
+  background:radial-gradient(circle,rgba(105,240,174,.3),transparent 70%);
+  animation:cockpitBreathe 2.5s ease-in-out infinite;
+  pointer-events:none;
+}
+.badge-live{position:relative;}
+
+/* ── Hover em alert-card-mini: scan-line que atravessa ─────────────────────── */
+.alert-card-mini{position:relative;overflow:hidden;}
+.alert-card-mini::after{
+  content:'';position:absolute;top:0;left:-100%;width:30%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);
+  pointer-events:none;
+  transition:left .6s ease;
+}
+.alert-card-mini:hover::after{left:130%;}
 </style>
 </head>
 <body>
@@ -887,6 +1336,9 @@ tr.total-row td{border-top:2px solid #90a4ae;font-size:11px;color:var(--blue);}
     </div>
     <div class="sync-badge" id="syncBadge">⟳ Sincronizando...</div>
     <div class="badge-live"><div class="dot-live dot-connecting" id="connDot"></div><span id="liveStatus">Conectando</span></div>
+    <button class="theme-toggle" id="geotabBadge" onclick="openGeotabConfig()" title="Configurar/Status Geotab" style="background:rgba(0,212,170,.15);border-color:rgba(0,212,170,.4);color:#c8fff4;">
+      🚐 <span id="geotabBadgeText">Geotab OFF</span>
+    </button>
     <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Alternar tema claro/escuro">🌙</button>
   </div>
 </div>
@@ -937,6 +1389,12 @@ tr.total-row td{border-top:2px solid #90a4ae;font-size:11px;color:var(--blue);}
   </button>
   <button class="ops-tab" data-op="SSP46" onclick="switchOperation('SSP46',this)">
     <span class="ops-indicator empty" id="ind-SSP46"></span>SSP46
+  </button>
+  <button class="ops-tab" data-op="SSP54" onclick="switchOperation('SSP54',this)">
+    <span class="ops-indicator empty" id="ind-SSP54"></span>SSP54
+  </button>
+  <button class="ops-tab" data-op="SSP64" onclick="switchOperation('SSP64',this)">
+    <span class="ops-indicator empty" id="ind-SSP64"></span>SSP64
   </button>
 </div>
 
@@ -1407,6 +1865,18 @@ tr.total-row td{border-top:2px solid #90a4ae;font-size:11px;color:var(--blue);}
   <div class="alert-grid" id="alertComGrid"></div>
 </div>
 
+<!-- 🚨 SEÇÃO COMPORTAMENTO (Geotab) — excesso velocidade, idling, freada brusca -->
+<div class="alert-section alert-behav" id="alertBehavSection" style="display:none">
+  <h3>
+    <span>🚨 Comportamento Geotab — Risco em tempo real</span>
+    <span class="alert-section-meta">
+      <span class="alert-count-badge" id="alertBehavCount">0 vans</span>
+      <span class="alert-deadline-info">🚐 Atualização a cada 60s</span>
+    </span>
+  </h3>
+  <div class="alert-grid" id="alertBehavGrid"></div>
+</div>
+
 <!-- CHARTS ROW 1 -->
 <div class="charts-grid" id="chartsRow1" style="display:none">
   <div class="chart-card">
@@ -1678,6 +2148,35 @@ tr.total-row td{border-top:2px solid #90a4ae;font-size:11px;color:var(--blue);}
 // ═══════════════════════════════════════════════════
 // FIREBASE CONFIG — preenchida pelo usuário
 // ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
+// localStorage SHIM — em alguns contextos (data: URLs, Safari privado estrito)
+// localStorage lança erro em QUALQUER acesso. Trocamos por polyfill em memória
+// quando necessário, para que TODO o resto do código continue funcionando.
+// ═══════════════════════════════════════════════════════════════════════
+(function(){
+  let ok = false;
+  try {
+    const k = '__lsprobe__' + Math.random();
+    window.localStorage.setItem(k, '1');
+    window.localStorage.removeItem(k);
+    ok = true;
+  } catch(e) { ok = false; }
+  if (!ok) {
+    const _m = {};
+    const mem = {
+      getItem(k){ return k in _m ? _m[k] : null; },
+      setItem(k,v){ _m[k] = String(v); },
+      removeItem(k){ delete _m[k]; },
+      clear(){ for (const k in _m) delete _m[k]; },
+      key(i){ return Object.keys(_m)[i] || null; },
+      get length(){ return Object.keys(_m).length; },
+    };
+    try { Object.defineProperty(window, 'localStorage', {value: mem, configurable: true, writable: false}); }
+    catch(e) { window.localStorage = mem; }
+    console.warn('[init] localStorage indisponível — usando shim em memória.');
+  }
+})();
+
 let db = null;
 let fstore = null; // Firestore — banco histórico
 let firebaseConnected = false;
@@ -2061,13 +2560,29 @@ function sanitizeDriversNames(driversArr) {
 function parseText(raw){
   const lines = raw.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>0);
 
-  // Cabeçalho de rota — todos os formatos Meli
-  // Formato normal: "CODE · #ID" (ex: "H7_AM · #382429034" ou "43 · #382449145")
-  // Formato AMBULÂNCIA em andamento: "Rota #ID" — sem código, indica que essa rota tem ambulância ativa
-  const HDR        = /^(?:Rota\s+#\d+|(?:[A-Z][A-Z0-9]*[\d_][A-Z0-9]*|\d{2,4})\s*[·•]\s*#\d+)/;
-  const HDR_NORMAL = /^([A-Z][A-Z0-9]*[\d_][A-Z0-9]*|\d{2,4})\s*[·•]\s*#(\d+)/m;
+  // Cabeçalho de rota — regex ROBUSTA (aceita variações do Logistics)
+  // Formatos aceitos:
+  //   "H7_AM1 · #382429034"      ← normal
+  //   "h7_am1 · #382429034"      ← minúsculas (FIX)
+  //   "H7-AM1 · #382429034"      ← hífen (FIX)
+  //   "ABC · #382429034"         ← só letras (FIX)
+  //   "43 · #382449145"          ← numérico curto
+  //   "38243 · #382449145"       ← numérico 5 dígitos (FIX)
+  //   "H7_AM1 • #382429034"      ← bullet
+  //   "H7_AM1 — #382429034"      ← travessão (FIX)
+  //   "H7_AM1 | #382429034"      ← pipe (FIX)
+  //   "H7_AM1 - #382429034"      ← hífen como separador (FIX)
+  //   "Rota #382429034"          ← AMBULÂNCIA (sem código)
+  // Código da rota: letras+dígitos+_-, 2 a 20 chars; OU 2-6 dígitos puros
+  const CODE     = '(?:[A-Za-z][A-Za-z0-9_\\-]{1,19}|\\d{2,6})';
+  const SEP      = '\\s*[·•\\-—\\|]\\s*';
+  const HDR        = new RegExp('^(?:Rota\\s+#\\d+|' + CODE + SEP + '#\\d+)', 'i');
+  const HDR_NORMAL = new RegExp('^(' + CODE + ')' + SEP + '#(\\d+)', 'im');
   const HDR_AMBU   = /^Rota\s+#(\d+)/im;
   const CHEVRON = /^CHEVRON_/i;
+
+  // Telemetria do parser — mostra quantos blocos foram processados/descartados
+  const parseStats = { blocksFound: 0, blocksDiscarded: 0, discardedReasons: [] };
 
   const blocks = [];
   let cur = null;
@@ -2105,6 +2620,7 @@ function parseText(raw){
 
   for(const bLines of blocks){
     if(!bLines || bLines.length===0) continue;
+    parseStats.blocksFound++;
     const block = bLines.join('\n');
 
     // Tenta primeiro o formato normal "CODE · #ID"; se falhar, tenta o formato ambulância "Rota #ID"
@@ -2112,16 +2628,23 @@ function parseText(raw){
     let isAmbuRoute = false;
     let rotaRaw, id;
     if (hdr) {
-      rotaRaw = hdr[1];
+      rotaRaw = hdr[1].toUpperCase().replace(/\s+/g,''); // normaliza — H7_AM1, h7_am1 → H7_AM1
       id      = hdr[2];
     } else {
       const hdrA = block.match(HDR_AMBU);
-      if (!hdrA) continue;
+      if (!hdrA) {
+        // DESCARTOU bloco — registra motivo
+        parseStats.blocksDiscarded++;
+        const first3 = bLines.slice(0, 3).join(' | ');
+        parseStats.discardedReasons.push('sem header: ' + first3.substring(0, 80));
+        console.warn('[parseText] Bloco descartado (sem header reconhecível):', first3);
+        continue;
+      }
       isAmbuRoute = true;
       id = hdrA[1];
-      // Tenta extrair o código da rota da próxima linha (SDD-XXXXXX · Utilitários SDD)
-      const sddM = block.match(/^([A-Z]+-[A-Z0-9]+)\s*[·•]/m);
-      rotaRaw = sddM ? sddM[1] : ('AMBU-' + id.slice(-4));
+      // Tenta extrair o código da rota da próxima linha (SDD-XXXXXX · Utilitários SDD) — aceita _ e - no código
+      const sddM = block.match(/^([A-Z]+[-_][A-Za-z0-9]+)\s*[·•\-—\|]/m);
+      rotaRaw = sddM ? sddM[1].toUpperCase() : ('AMBU-' + id.slice(-4));
     }
     const isNexRoute = /^\d{2,4}$/.test(rotaRaw);
 
@@ -2165,18 +2688,24 @@ function parseText(raw){
     const stemInM  = block.match(/Stem\s*In[\s\S]{0,60}?(\d{1,2}:\d{2})\s*h\b/i);
 
     let nome = '';
+    // Regex de "palavra de nome válido" — aceita acentos, apóstrofo (D'Souza),
+    // hífen (Jean-Pierre), ponto (Jr., Sr.), diacríticos completos
+    const NAME_WORD = /^[A-Za-zÀ-ÖØ-öø-ÿ'’\-\.]{2,}$/;
     for(const line of bLines){
       if(!line || line.length<4) continue;
       if(NOISE.test(line)) continue;
       if(SKIP.has(line)) continue;
       if(HDR.test(line)) continue;
       if(/^\d/.test(line)) continue;
+      // Rejeita caracteres que indicam que é dado, não nome (#/·/•/@/%/$/dígito)
       if(/[#·•@%$\d]/.test(line)) continue;
       if(/^[A-Z]{2,5}\d/.test(line)) continue;
       if(NOT_NAME.test(line)) continue;
       const words = line.split(/\s+/).filter(Boolean);
       if(words.length<2 || words.length>7) continue;
-      if(words.every(w=>/^[a-záàâãéêèíïóôõöúüçñA-ZÁÀÂÃÉÊÈÍÏÓÔÕÖÚÜÇÑ]+$/.test(w))){
+      // Aceita pelo menos 80% das palavras como nome válido (tolera "Jr." ou "D'Souza")
+      const valid = words.filter(w => NAME_WORD.test(w)).length;
+      if (valid / words.length >= 0.8) {
         nome=line; break;
       }
     }
@@ -2260,6 +2789,9 @@ function parseText(raw){
     // Debug — remover após confirmar
     if(ozhM||execM) console.log(`[DEBUG] ${rotaRaw} | OZH=${ozhM?ozhM[1]:'—'} | ORHExec=${execM?execM[1]:'—'} | ORHPlan=${planM?planM[1]:'—'}`);
   }
+  // Telemetria final do parser — expõe para importData usar na mensagem de status
+  results._parseStats = parseStats;
+  console.log('[parseText] stats:', parseStats);
   return results;
 }
 
@@ -2288,7 +2820,14 @@ function importData(){
   writeSnapshot(label, totalOk, totalSpr);
   const now2 = new Date();
   const lbl2 = now2.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-  showStatus(`✔ ${parsed.length} motoristas importados e sincronizados às ${lbl2}! Se o número estiver menor que o esperado, verifique se copiou todos os motoristas da tela do Meli.`, 'ok');
+  const stats = parsed._parseStats || {blocksFound: parsed.length, blocksDiscarded: 0};
+  let msg = `✔ ${parsed.length} motoristas importados às ${lbl2}.`;
+  if (stats.blocksDiscarded > 0) {
+    msg += ` ⚠ ${stats.blocksDiscarded} bloco(s) descartado(s) pelo parser (header não reconhecido) — abra o console (F12) para ver detalhes.`;
+    showStatus(msg, 'err');
+  } else {
+    showStatus(msg + ` Processados: ${stats.blocksFound}, descartados: 0.`, 'ok');
+  }
 }
 
 function loadSampleData(){document.getElementById('rawInput').value=SAMPLE_DATA;showStatus('Exemplo carregado. Clique em Importar e Sincronizar.','ok');}
@@ -2346,6 +2885,8 @@ const OP_CITIES = {
   SSP38: 'ITUPEVA',
   SSP45: 'ITAQUERA',
   SSP46: 'SANTOS II',
+  SSP54: 'DHL — SSP54',
+  SSP64: 'DHL — SSP64',
 };
 
 function renderOverviewCard() {
@@ -3729,7 +4270,7 @@ Concluída`;
 let currentOperation = 'SSP6';
 
 // Per-operation state cache (in memory) — ordered numerically (SSP6 → SSP46)
-const OPERATIONS = ['SSP6','SSP9','SSP15','SSP17','SSP18','SSP20','SSP25','SSP27','SSP29','SSP36','SSP38','SSP45','SSP46'];
+const OPERATIONS = ['SSP6','SSP9','SSP15','SSP17','SSP18','SSP20','SSP25','SSP27','SSP29','SSP36','SSP38','SSP45','SSP46','SSP54','SSP64'];
 const opState = OPERATIONS.reduce((acc, op) => {
   acc[op] = { drivers: [], extras: {}, snapshots: [], pausedRoutes: [] };
   return acc;
@@ -5091,6 +5632,114 @@ document.getElementById('fb-url').value = fbConfig.databaseURL || PRE_CONFIG.dat
 document.getElementById('fb-apikey').value = fbConfig.apiKey || PRE_CONFIG.apiKey;
 document.getElementById('fb-projectid').value = fbConfig.projectId || PRE_CONFIG.projectId;
 autoConnect();
+
+// ═══════════════════════════════════════════════════════════════════════
+// PACOTE ANIMAÇÕES — counter-up KPIs, confetti DS=100%, sonar hover
+// Observa mudanças no textContent de .k-val e anima 0→valor em 600ms.
+// Dispara confetti quando #k-ds exibe "100.0%".
+// ═══════════════════════════════════════════════════════════════════════
+(function(){
+  const EASE_OUT = t => 1 - Math.pow(1 - t, 3);
+
+  // Anima número de 0 a target em `dur` ms. Preserva sufixo (%, / etc) e separadores.
+  function animateCounter(el, finalText){
+    if (!el || !finalText) return;
+    const match = String(finalText).match(/^(-?[\d.,]+)(.*)$/);
+    if (!match) { el.textContent = finalText; return; }
+    const numStr = match[1].replace(/\./g,'').replace(',','.');
+    const target = parseFloat(numStr);
+    const suffix = match[2] || '';
+    if (!isFinite(target) || target === 0) { el.textContent = finalText; return; }
+    const hasDecimal = numStr.includes('.');
+    const dur = 650;
+    const start = performance.now();
+    el.classList.add('counter-animating');
+    el._animToken = (el._animToken || 0) + 1;
+    const myToken = el._animToken;
+    function tick(now){
+      if (el._animToken !== myToken) return; // substituído por nova animação
+      const elapsed = now - start;
+      const t = Math.min(elapsed / dur, 1);
+      const current = target * EASE_OUT(t);
+      let txt;
+      if (hasDecimal) txt = current.toFixed(1).replace('.', ',');
+      else txt = Math.round(current).toLocaleString('pt-BR');
+      el.textContent = txt + suffix;
+      if (t < 1) requestAnimationFrame(tick);
+      else { el.textContent = finalText; el.classList.remove('counter-animating'); }
+    }
+    requestAnimationFrame(tick);
+  }
+
+  // Confetti burst — gera 60 pedacinhos coloridos caindo do topo.
+  // Usado quando DS atinge 100%.
+  function fireConfetti(){
+    let host = document.getElementById('confettiHost');
+    if (!host) {
+      host = document.createElement('div');
+      host.id = 'confettiHost';
+      document.body.appendChild(host);
+    }
+    const colors = ['#FFE600','#3483FA','#00D4AA','#FF4757','#FFA502','#ce93d8','#00E5FF'];
+    for (let i = 0; i < 60; i++) {
+      const p = document.createElement('div');
+      p.className = 'confetti-piece';
+      p.style.left = (Math.random() * 100) + '%';
+      p.style.background = colors[i % colors.length];
+      p.style.animationDuration = (2 + Math.random() * 2) + 's';
+      p.style.animationDelay = (Math.random() * 0.3) + 's';
+      p.style.transform = 'rotate(' + (Math.random() * 360) + 'deg)';
+      host.appendChild(p);
+      setTimeout(() => p.remove(), 4500);
+    }
+  }
+
+  // Observa mudanças no texto dos KPIs e anima counter-up.
+  // Também observa #k-ds — quando chega a 100.0%, dispara confetti (uma vez por sessão).
+  let lastDsWasPerfect = false;
+  function observeKpiChanges(){
+    const kpiVals = document.querySelectorAll('.kpi .k-val');
+    if (!kpiVals.length) return;
+    kpiVals.forEach(el => {
+      if (el._observed) return;
+      el._observed = true;
+      el._lastText = el.textContent;
+      const mo = new MutationObserver(() => {
+        const newText = el.textContent;
+        if (newText === el._lastText) return;
+        // Só anima se o valor é numérico e diferente
+        if (/\d/.test(newText) && newText !== '—') {
+          const oldText = el._lastText;
+          el._lastText = newText;
+          animateCounter(el, newText);
+          // Detecta DS% em 100%
+          if (el.id === 'k-ds' && /^100[,.]0%?/.test(newText) && !lastDsWasPerfect) {
+            lastDsWasPerfect = true;
+            setTimeout(fireConfetti, 400);
+            setTimeout(() => el.closest('.kpi')?.classList.add('ds-perfect'), 400);
+          } else if (el.id === 'k-ds' && !/^100[,.]0/.test(newText)) {
+            lastDsWasPerfect = false;
+            el.closest('.kpi')?.classList.remove('ds-perfect');
+          }
+        } else {
+          el._lastText = newText;
+        }
+      });
+      mo.observe(el, {childList:true, characterData:true, subtree:true});
+    });
+  }
+
+  // Rode periodicamente para pegar KPIs que entram no DOM depois (ex: Geral/Historico)
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => { observeKpiChanges(); setInterval(observeKpiChanges, 2500); });
+  } else {
+    observeKpiChanges();
+    setInterval(observeKpiChanges, 2500);
+  }
+
+  // Expõe globalmente para facilitar teste manual
+  window._cockpit = { animateCounter, fireConfetti, observeKpiChanges };
+})();
 </script>
 <!-- MODAL FECHAR TURNO -->
 <div class="ft-overlay" id="ftOverlay" style="display:none" onclick="if(event.target===this)closeFtModal()">
@@ -5443,6 +6092,462 @@ if (document.readyState === 'loading') {
   </div>
   <button class="fab-main" id="fabMain" onclick="toggleFabMenu(); event.stopPropagation();" aria-label="Ações rápidas">+</button>
 </div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     MODAL CONFIG GEOTAB — colar URL CSV publicada do Apps Script
+     ═══════════════════════════════════════════════════════════════════════ -->
+<div class="ft-overlay" id="geotabOverlay" style="display:none" onclick="if(event.target===this)closeGeotabConfig()">
+  <div class="ft-modal" style="max-width:560px">
+    <h2 style="color:#00D4AA">🚐 Configurar Geotab</h2>
+    <p class="ft-sub">
+      Cole a URL do CSV publicada pelo Google Apps Script.
+      Instruções completas em <code>GEOTAB_SETUP.md</code> (na mesma pasta do HTML).
+    </p>
+    <div class="ft-fields">
+      <div>
+        <label>Modo de coleta</label>
+        <select id="geotab-mode" onchange="toggleGeotabMode()">
+          <option value="firebase">🔥 Firebase RTDB (bookmarklet — recomendado p/ Chrome ML)</option>
+          <option value="csv">📄 CSV do Google Sheets (Apps Script)</option>
+        </select>
+      </div>
+      <div id="geotab-csv-field">
+        <label>URL do CSV Geotab (modo Apps Script)</label>
+        <input type="url" id="geotab-url" placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?gid=...&single=true&output=csv" style="font-family:monospace;font-size:11px">
+      </div>
+      <div id="geotab-interval-field">
+        <label>Intervalo de atualização (segundos — modo CSV)</label>
+        <input type="number" id="geotab-interval" min="30" max="600" value="60">
+      </div>
+      <div id="geotab-firebase-info" style="display:none;background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.4);border-radius:6px;padding:10px;font-size:12px;line-height:1.5;color:var(--text2)">
+        <strong style="color:#00D4AA">🔥 Modo Firebase ativo</strong><br>
+        Dashboard escuta <code>/geotab/live</code> no RTDB.<br>
+        Para popular: abra <code>my.geotab.com</code>, clique no bookmarklet <strong>🚐 Sync Geotab</strong>.<br>
+        Instruções completas: <code>GEOTAB_BOOKMARKLET.md</code> (mesma pasta do HTML)
+      </div>
+    </div>
+    <div class="ft-status" id="geotab-status"></div>
+    <div class="ft-btns">
+      <button class="btn-secondary" onclick="disconnectGeotab()" title="Remove a URL salva e desliga Geotab">🚫 Desconectar</button>
+      <button class="btn-secondary" onclick="testGeotab()" title="Testa fetch do CSV agora">🔍 Testar conexão</button>
+      <button class="btn-secondary" onclick="closeGeotabConfig()">Fechar</button>
+      <button class="btn-fechar" onclick="saveGeotabConfig()" style="background:linear-gradient(135deg,#00D4AA,#00897B)">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<style>
+/* ── Botão Geotab no header com animação quando conectado ──────────────────── */
+#geotabBadge.geotab-on{background:rgba(0,212,170,.25)!important;border-color:#00D4AA!important;animation:cockpitBreathe 2.8s ease-in-out infinite;}
+#geotabBadge.geotab-off{opacity:.7;}
+#geotabBadge.geotab-err{background:rgba(255,71,87,.2)!important;border-color:#FF4757!important;animation:cockpitCriticalFlash 1.3s ease-in-out infinite;}
+
+/* ── Seção Comportamento — cockpit vermelho-amarelo alerta ─────────────────── */
+.alert-section.alert-behav{background:linear-gradient(135deg,rgba(255,165,2,.12),rgba(183,28,28,.06));border-color:#FFA502;}
+.alert-section.alert-behav h3{color:#bf360c;}
+.alert-section.alert-behav .alert-count-badge{background:linear-gradient(135deg,#FFA502,#bf360c);}
+.alert-section.alert-behav .alert-card-mini{border-left-color:#FFA502;}
+.alert-section.alert-behav .alert-card-mini.critico{border-left-color:#b71c1c;border-left-width:6px;animation:pulseCard 1.5s infinite;}
+.alert-section.alert-behav .alert-metric{color:#bf360c;}
+[data-theme="dark"] .alert-section.alert-behav{background:linear-gradient(135deg,rgba(255,165,2,.18),rgba(183,28,28,.1));}
+
+/* ── Bloco telemetria dentro dos cards da Visão Rápida ─────────────────────── */
+.qv-telemetry{
+  margin-top:5px;padding:6px 8px;border-radius:5px;
+  background:linear-gradient(135deg,rgba(0,212,170,.12),rgba(0,212,170,.04));
+  border:1px solid rgba(0,212,170,.3);
+  font-size:10px;line-height:1.4;
+  display:flex;flex-direction:column;gap:3px;
+}
+.qv-telemetry.status-off{background:linear-gradient(135deg,rgba(106,27,154,.12),rgba(106,27,154,.04));border-color:rgba(106,27,154,.35);}
+.qv-telemetry.status-parado{background:linear-gradient(135deg,rgba(255,165,2,.12),rgba(255,165,2,.04));border-color:rgba(255,165,2,.35);}
+.qv-telemetry.status-off .qv-tel-status{color:#9b59b6;}
+.qv-telemetry.status-parado .qv-tel-status{color:#FFA502;}
+.qv-telemetry.status-movendo .qv-tel-status{color:#00D4AA;}
+.qv-tel-row{display:flex;justify-content:space-between;align-items:center;gap:6px;}
+.qv-tel-placa{font-family:'Consolas','Monaco',monospace;font-weight:700;color:var(--text);font-size:11px;letter-spacing:.5px;}
+.qv-tel-status{font-weight:700;text-shadow:0 0 6px currentColor;}
+.qv-tel-metric{display:inline-flex;align-items:center;gap:3px;font-weight:600;color:var(--text2);}
+.qv-tel-metric strong{color:var(--text);}
+.qv-tel-metric.high-speed{color:#FF4757;animation:cockpitCriticalFlash 1.5s ease-in-out infinite;}
+.qv-tel-alerts{display:flex;gap:3px;flex-wrap:wrap;margin-top:2px;}
+.qv-tel-alert-tag{font-size:8px;padding:1px 5px;border-radius:3px;background:rgba(255,71,87,.2);color:#FF4757;border:1px solid rgba(255,71,87,.4);text-transform:uppercase;letter-spacing:.3px;font-weight:700;}
+.qv-tel-stale{opacity:.55;filter:grayscale(.5);}
+.qv-tel-stale::before{content:'⏱ dados antigos · ';color:var(--text3);font-weight:400;}
+[data-theme="dark"] .qv-telemetry{background:linear-gradient(135deg,rgba(0,212,170,.18),rgba(0,212,170,.06));}
+
+/* ── Card com problema Geotab (velocidade alta) ganha glow vermelho ────────── */
+.qv-card.geotab-overspeed{box-shadow:0 0 0 2px rgba(255,71,87,.4),0 0 20px rgba(255,71,87,.4)!important;}
+</style>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════
+// INTEGRAÇÃO GEOTAB — via Google Apps Script CSV bridge
+// ═══════════════════════════════════════════════════════════════════════
+const GEOTAB_CFG_KEY = 'ssp36_geotab_config';
+let geotabConfig = (()=>{ try { return JSON.parse(localStorage.getItem(GEOTAB_CFG_KEY) || '{}'); } catch(e){ return {}; } })();
+let geotabData = {}; // indexado por motorista normalizado (lowercase, sem acento)
+let geotabByPlate = {};
+let geotabRefreshTimer = null;
+let geotabLastSync = null;
+let geotabLastError = null;
+
+function _normName(s){ return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9 ]/g,'').trim(); }
+
+function openGeotabConfig(){
+  const modeSel = document.getElementById('geotab-mode');
+  if (modeSel) modeSel.value = geotabConfig.mode || 'firebase';
+  toggleGeotabMode();
+  document.getElementById('geotab-url').value = geotabConfig.csvUrl || '';
+  document.getElementById('geotab-interval').value = geotabConfig.intervalSec || 60;
+  const st = document.getElementById('geotab-status');
+  if (geotabLastSync) {
+    st.textContent = `✅ Última sincronização: ${new Date(geotabLastSync).toLocaleString('pt-BR')} — ${Object.keys(geotabByPlate).length} vans`;
+    st.className = 'ft-status ok';
+  } else if (geotabLastError) {
+    st.textContent = `❌ Erro: ${geotabLastError}`;
+    st.className = 'ft-status err';
+  } else {
+    st.textContent = '';
+    st.style.display = 'none';
+  }
+  document.getElementById('geotabOverlay').style.display = 'flex';
+}
+function closeGeotabConfig(){ document.getElementById('geotabOverlay').style.display = 'none'; }
+
+function saveGeotabConfig(){
+  const mode = (document.getElementById('geotab-mode')?.value) || 'firebase';
+  if (mode === 'firebase') {
+    geotabConfig = { mode: 'firebase' };
+    try { localStorage.setItem(GEOTAB_CFG_KEY, JSON.stringify(geotabConfig)); } catch(e){}
+    showGeotabStatus('✅ Modo Firebase ativo. Aguardando dados do bookmarklet...', 'ok');
+    startGeotabRefresh();
+    setTimeout(closeGeotabConfig, 1500);
+    return;
+  }
+  const url = (document.getElementById('geotab-url').value || '').trim();
+  const interval = Math.max(30, Math.min(600, parseInt(document.getElementById('geotab-interval').value || '60', 10)));
+  if (!url) { showGeotabStatus('URL vazia — cole a URL do CSV publicada pelo Apps Script.', 'err'); return; }
+  if (!url.includes('output=csv')) { showGeotabStatus('⚠ URL não parece CSV publicado. Deve terminar em output=csv', 'err'); return; }
+  geotabConfig = { mode: 'csv', csvUrl: url, intervalSec: interval };
+  try { localStorage.setItem(GEOTAB_CFG_KEY, JSON.stringify(geotabConfig)); } catch(e){}
+  showGeotabStatus('✅ Configuração salva. Iniciando sincronização...', 'ok');
+  startGeotabRefresh();
+  setTimeout(closeGeotabConfig, 1500);
+}
+
+function disconnectGeotab(){
+  geotabConfig = {};
+  try { localStorage.removeItem(GEOTAB_CFG_KEY); } catch(e){}
+  geotabData = {}; geotabByPlate = {};
+  stopGeotabRefresh();
+  updateGeotabBadge();
+  try { if (drivers.length) updateAll(); } catch(e){}
+  showGeotabStatus('🚫 Desconectado.', 'ok');
+}
+
+function showGeotabStatus(msg, kind){
+  const st = document.getElementById('geotab-status');
+  st.textContent = msg; st.className = 'ft-status ' + (kind || 'ok'); st.style.display = 'block';
+}
+
+async function testGeotab(){
+  const url = (document.getElementById('geotab-url').value || '').trim();
+  if (!url) { showGeotabStatus('Cole uma URL primeiro.', 'err'); return; }
+  showGeotabStatus('⏳ Testando...', 'ok');
+  try {
+    const data = await fetchGeotabCSV(url);
+    showGeotabStatus(`✅ ${data.length} linha(s) recebidas. Headers: ${Object.keys(data[0]||{}).join(', ')}`, 'ok');
+  } catch(e){ showGeotabStatus('❌ ' + e.message, 'err'); }
+}
+
+// Parser CSV simples — sem dependências externas, tolera aspas
+function parseCSV(text){
+  const rows = []; let row = []; let cur = ''; let inQuote = false;
+  for (let i = 0; i < text.length; i++){
+    const c = text[i];
+    if (inQuote){
+      if (c === '"' && text[i+1] === '"') { cur += '"'; i++; }
+      else if (c === '"') { inQuote = false; }
+      else cur += c;
+    } else {
+      if (c === '"') inQuote = true;
+      else if (c === ',') { row.push(cur); cur = ''; }
+      else if (c === '\n' || c === '\r') {
+        if (c === '\r' && text[i+1] === '\n') i++;
+        if (cur !== '' || row.length) { row.push(cur); rows.push(row); row = []; cur = ''; }
+      } else cur += c;
+    }
+  }
+  if (cur !== '' || row.length) { row.push(cur); rows.push(row); }
+  if (!rows.length) return [];
+  const headers = rows.shift().map(h => h.trim());
+  return rows
+    .filter(r => r.some(c => c && c.trim()))
+    .map(r => { const o = {}; headers.forEach((h,i)=>o[h]=(r[i]||'').trim()); return o; });
+}
+
+async function fetchGeotabCSV(url){
+  const resp = await fetch(url, { cache: 'no-store' });
+  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+  const text = await resp.text();
+  return parseCSV(text);
+}
+
+async function refreshGeotab(){
+  if (!geotabConfig.csvUrl) return;
+  try {
+    const rows = await fetchGeotabCSV(geotabConfig.csvUrl);
+    geotabData = {}; geotabByPlate = {};
+    rows.forEach(r => {
+      const placa = (r.placa || '').toUpperCase().trim();
+      if (!placa) return;
+      const nm = _normName(r.motorista || '');
+      const entry = {
+        placa, motorista: r.motorista, operacao: r.operacao,
+        status: r.status || 'SEM_DADOS',
+        velocidade: parseInt(r.velocidade || '0', 10) || 0,
+        kmHoje: parseInt(r.kmHoje || '0', 10) || 0,
+        lat: parseFloat(r.lat) || null, lon: parseFloat(r.lon) || null,
+        lastUpdate: r.lastUpdate || null,
+        alertas: (r.alertas || '').split(/\s*·\s*/).filter(Boolean),
+      };
+      geotabByPlate[placa] = entry;
+      if (nm) geotabData[nm] = entry;
+    });
+    geotabLastSync = Date.now(); geotabLastError = null;
+    updateGeotabBadge();
+    // Re-render se tiver drivers importados
+    if (drivers && drivers.length) {
+      try { renderQuickView(); renderBehavAlertSection(); } catch(e){ console.error('[geotab] render:', e); }
+    }
+    console.log('[geotab] sync OK — ' + Object.keys(geotabByPlate).length + ' vans');
+  } catch(e){
+    geotabLastError = e.message;
+    updateGeotabBadge();
+    console.warn('[geotab] erro no refresh:', e.message);
+  }
+}
+
+function startGeotabRefresh(){
+  stopGeotabRefresh();
+  if (geotabConfig.mode === 'firebase') { startGeotabFirebaseListener(); return; }
+  if (!geotabConfig.csvUrl) return;
+  refreshGeotab();
+  const ms = Math.max(30, geotabConfig.intervalSec || 60) * 1000;
+  geotabRefreshTimer = setInterval(refreshGeotab, ms);
+}
+function stopGeotabRefresh(){
+  if (geotabRefreshTimer) { clearInterval(geotabRefreshTimer); geotabRefreshTimer = null; }
+  stopGeotabFirebaseListener();
+}
+
+// ── MODO FIREBASE RTDB — ouve /geotab/live populado pelo bookmarklet ─────────
+let _geotabFbRef = null;
+function startGeotabFirebaseListener(){
+  stopGeotabFirebaseListener();
+  if (typeof firebase === 'undefined' || !firebase.database) {
+    geotabLastError = 'Firebase não carregado ainda — tente reconectar';
+    updateGeotabBadge();
+    return;
+  }
+  try {
+    _geotabFbRef = firebase.database().ref('geotab/live');
+    _geotabFbRef.on('value', snap => {
+      const payload = snap.val();
+      if (!payload || !payload.data) {
+        geotabByPlate = {}; geotabData = {};
+        geotabLastSync = null;
+        updateGeotabBadge();
+        return;
+      }
+      geotabByPlate = {};
+      geotabData = {};
+      Object.entries(payload.data).forEach(([placa, entry]) => {
+        const e = Object.assign({ placa }, entry, {
+          alertas: Array.isArray(entry.alertas) ? entry.alertas : [],
+        });
+        geotabByPlate[placa] = e;
+        if (e.motorista) geotabData[_normName(e.motorista)] = e;
+      });
+      geotabLastSync = payload.updatedAt || Date.now();
+      geotabLastError = null;
+      updateGeotabBadge();
+      try {
+        if (drivers && drivers.length) { renderQuickView(); }
+        renderBehavAlertSection();
+      } catch(e) { console.error('[geotab-fb] render:', e); }
+      console.log('[geotab-fb] recebido — ' + Object.keys(geotabByPlate).length + ' vans');
+    }, err => {
+      geotabLastError = 'Firebase: ' + err.message;
+      updateGeotabBadge();
+      console.warn('[geotab-fb] erro:', err);
+    });
+  } catch(e) {
+    geotabLastError = e.message;
+    updateGeotabBadge();
+  }
+}
+function stopGeotabFirebaseListener(){
+  if (_geotabFbRef) { try { _geotabFbRef.off(); } catch(e){} _geotabFbRef = null; }
+}
+
+// Toggle visual entre campos CSV e Firebase no modal de config
+function toggleGeotabMode(){
+  const mode = document.getElementById('geotab-mode').value;
+  const isFb = mode === 'firebase';
+  const csvField = document.getElementById('geotab-csv-field');
+  const intField = document.getElementById('geotab-interval-field');
+  const fbInfo   = document.getElementById('geotab-firebase-info');
+  if (csvField) csvField.style.display = isFb ? 'none' : '';
+  if (intField) intField.style.display = isFb ? 'none' : '';
+  if (fbInfo)   fbInfo.style.display   = isFb ? 'block' : 'none';
+}
+
+function updateGeotabBadge(){
+  const btn = document.getElementById('geotabBadge');
+  const txt = document.getElementById('geotabBadgeText');
+  if (!btn || !txt) return;
+  btn.classList.remove('geotab-on','geotab-off','geotab-err');
+  if (geotabLastError) {
+    btn.classList.add('geotab-err');
+    txt.textContent = 'Geotab ERRO';
+  } else if (!geotabConfig.csvUrl) {
+    btn.classList.add('geotab-off');
+    txt.textContent = 'Geotab OFF';
+  } else {
+    btn.classList.add('geotab-on');
+    const n = Object.keys(geotabByPlate).length;
+    const when = geotabLastSync ? new Date(geotabLastSync).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) : '—';
+    txt.textContent = `Geotab · ${n} vans · ${when}`;
+  }
+}
+
+// Helper usado por renderQuickView para pegar telemetria de um driver
+function getGeotabFor(d){
+  if (!d) return null;
+  const nm = _normName(d.nome || '');
+  if (nm && geotabData[nm]) return geotabData[nm];
+  return null;
+}
+
+// Monta o HTML do bloco telemetria para um driver
+function renderGeotabBlock(d){
+  const g = getGeotabFor(d);
+  if (!g) return '';
+  const statusMap = {
+    EM_MOVIMENTO:   { cls: 'status-movendo', label: '🟢 Movendo' },
+    PARADO_LIGADO:  { cls: 'status-parado',  label: '🟡 Parado' },
+    IGNICAO_OFF:    { cls: 'status-off',     label: '🟣 Off' },
+    SEM_DADOS:      { cls: 'status-off',     label: '⚫ Sem dados' },
+    'NÃO ENCONTRADA':{ cls: 'status-off',    label: '⚫ N/E' },
+  };
+  const st = statusMap[g.status] || statusMap.SEM_DADOS;
+  const isStale = g.lastUpdate && (Date.now() - new Date(g.lastUpdate).getTime()) > 10*60*1000;
+  const speedCls = g.velocidade > 80 ? 'high-speed' : '';
+  const alertTags = (g.alertas||[]).slice(0,3).map(a=>`<span class="qv-tel-alert-tag">${a}</span>`).join('');
+  return `<div class="qv-telemetry ${st.cls} ${isStale?'qv-tel-stale':''}">
+    <div class="qv-tel-row">
+      <span class="qv-tel-placa">🚐 ${g.placa}</span>
+      <span class="qv-tel-status">${st.label}</span>
+    </div>
+    <div class="qv-tel-row">
+      <span class="qv-tel-metric ${speedCls}">⚡ <strong>${g.velocidade}</strong> km/h</span>
+      <span class="qv-tel-metric">📏 <strong>${g.kmHoje}</strong> km hoje</span>
+    </div>
+    ${alertTags ? `<div class="qv-tel-alerts">${alertTags}</div>` : ''}
+  </div>`;
+}
+
+// Nova seção de alerta Comportamento — mostra vans em risco
+function renderBehavAlertSection(){
+  const sec   = document.getElementById('alertBehavSection');
+  const grid  = document.getElementById('alertBehavGrid');
+  const badge = document.getElementById('alertBehavCount');
+  if (!sec || !grid) return;
+  if (!Object.keys(geotabByPlate).length) { sec.style.display = 'none'; return; }
+  const problems = Object.values(geotabByPlate)
+    .filter(g => g.velocidade > 80 || (g.alertas && g.alertas.length > 0))
+    .sort((a,b) => (b.velocidade||0) - (a.velocidade||0));
+  if (!problems.length) { sec.style.display = 'none'; return; }
+  sec.style.display = '';
+  badge.textContent = `${problems.length} van${problems.length>1?'s':''}`;
+  grid.innerHTML = problems.map(g => {
+    const isCritical = g.velocidade > 100;
+    const actions = g.velocidade > 80 ? '⚡ Reduzir velocidade — ligar motorista' :
+                    g.alertas.length ? '📞 Analisar comportamento' : 'Acompanhar';
+    return `<div class="alert-card-mini ${isCritical?'critico':''}" title="${g.motorista||'?'}">
+      <div class="alert-row1">
+        <div>
+          <div class="alert-name">${g.motorista || g.placa}</div>
+          <div class="alert-rota">🚐 ${g.placa} · ${g.operacao || '—'}</div>
+        </div>
+        <div class="alert-metric">${g.velocidade} km/h</div>
+      </div>
+      <div class="alert-action">${(g.alertas||[]).join(' · ') || actions}</div>
+    </div>`;
+  }).join('');
+}
+
+// Monkey-patch renderQuickView para incluir o bloco telemetria em cada card
+(function patchRenderQuickView(){
+  if (typeof renderQuickView !== 'function') return;
+  const original = renderQuickView;
+  window.renderQuickView = function(){
+    original.apply(this, arguments);
+    // Após o render original, injeta o bloco Geotab em cada card
+    const cards = document.querySelectorAll('#qvGrid .qv-card');
+    cards.forEach((card, idx) => {
+      // Nome do motorista está no primeiro elemento com classe qv-name
+      const nameEl = card.querySelector('.qv-name');
+      if (!nameEl) return;
+      const driverName = nameEl.textContent.trim();
+      const d = drivers.find(x => (x.nome||'').toLowerCase() === driverName.toLowerCase());
+      if (!d) return;
+      const g = getGeotabFor(d);
+      if (!g) return;
+      // Evita duplicação
+      if (card.querySelector('.qv-telemetry')) return;
+      const html = renderGeotabBlock(d);
+      // Insere antes do bloco .qv-badges (para ficar entre times e badges)
+      const badges = card.querySelector('.qv-badges');
+      if (badges) badges.insertAdjacentHTML('beforebegin', html);
+      else card.insertAdjacentHTML('beforeend', html);
+      if (g.velocidade > 80) card.classList.add('geotab-overspeed');
+    });
+  };
+})();
+
+// Inicializa na carga da página
+function _geotabShouldStart(){
+  if (!geotabConfig) return false;
+  if (geotabConfig.mode === 'firebase') return true;
+  if (geotabConfig.csvUrl) return true;
+  return false;
+}
+(function initGeotab(){
+  const kickoff = () => {
+    updateGeotabBadge();
+    if (_geotabShouldStart()) {
+      // Se modo firebase, aguarda Firebase estar pronto (listener de connected já cuida)
+      if (geotabConfig.mode === 'firebase') {
+        // Tenta imediato e também depois que .info/connected disparar
+        const tryStart = () => startGeotabRefresh();
+        tryStart();
+        if (typeof firebase !== 'undefined' && firebase.database) {
+          firebase.database().ref('.info/connected').on('value', snap => {
+            if (snap.val() && !_geotabFbRef) tryStart();
+          });
+        }
+      } else {
+        startGeotabRefresh();
+      }
+    }
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', kickoff);
+  else kickoff();
+})();
+</script>
 
 </body>
 </html>
