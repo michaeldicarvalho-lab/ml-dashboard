@@ -5642,14 +5642,28 @@ autoConnect();
   const EASE_OUT = t => 1 - Math.pow(1 - t, 3);
 
   // Anima número de 0 a target em `dur` ms. Preserva sufixo (%, / etc) e separadores.
+  // Normaliza -0 → 0 (JS zero negativo que vira "-0" em toLocaleString)
+  function _fixZero(n){ return Object.is(n, -0) ? 0 : n; }
+  function _cleanFinal(s){
+    if (!s) return s;
+    // Normaliza "-0" string → "0" (preserva sufixo tipo "-0%" → "0%")
+    return String(s).replace(/^-0(\b|%|,|\.)/, '0$1').replace(/^-0$/, '0');
+  }
   function animateCounter(el, finalText){
-    if (!el || !finalText) return;
+    if (!el) return;
+    finalText = _cleanFinal(finalText);
+    if (!finalText) return;
     const match = String(finalText).match(/^(-?[\d.,]+)(.*)$/);
     if (!match) { el.textContent = finalText; return; }
     const numStr = match[1].replace(/\./g,'').replace(',','.');
     const target = parseFloat(numStr);
     const suffix = match[2] || '';
-    if (!isFinite(target) || target === 0) { el.textContent = finalText; return; }
+    if (!isFinite(target) || target === 0) {
+      el.textContent = finalText.replace(/^-0/, '0');
+      el._lastText = el.textContent;
+      el.classList.remove('counter-animating');
+      return;
+    }
     const hasDecimal = numStr.includes('.');
     const dur = 650;
     const start = performance.now();
@@ -5657,16 +5671,18 @@ autoConnect();
     el._animToken = (el._animToken || 0) + 1;
     const myToken = el._animToken;
     function tick(now){
-      if (el._animToken !== myToken) return; // substituído por nova animação
+      if (el._animToken !== myToken) return;
       const elapsed = now - start;
       const t = Math.min(elapsed / dur, 1);
-      const current = target * EASE_OUT(t);
+      const current = _fixZero(target * EASE_OUT(t));
       let txt;
       if (hasDecimal) txt = current.toFixed(1).replace('.', ',');
       else txt = Math.round(current).toLocaleString('pt-BR');
+      // Defensive: remove sinal negativo leading
+      txt = txt.replace(/^-(?=0(?:\b|,|\.))/, '');
       el.textContent = txt + suffix;
       if (t < 1) requestAnimationFrame(tick);
-      else { el.textContent = finalText; el.classList.remove('counter-animating'); }
+      else { el.textContent = finalText; el.classList.remove('counter-animating'); el._lastText = finalText; }
     }
     requestAnimationFrame(tick);
   }
@@ -5705,7 +5721,16 @@ autoConnect();
       el._observed = true;
       el._lastText = el.textContent;
       const mo = new MutationObserver(() => {
-        const newText = el.textContent;
+        // Lê e normaliza "-0" → "0" antes de comparar/propagar
+        let newText = el.textContent;
+        const cleaned = _cleanFinal(newText);
+        if (cleaned !== newText) {
+          // Previne loop: desconecta MO temporariamente, corrige DOM, reconecta
+          mo.disconnect();
+          el.textContent = cleaned;
+          newText = cleaned;
+          mo.observe(el, {childList:true, characterData:true, subtree:true});
+        }
         if (newText === el._lastText) return;
         // Só anima se o valor é numérico e diferente
         if (/\d/.test(newText) && newText !== '—') {
@@ -6172,6 +6197,13 @@ if (document.readyState === 'loading') {
 .qv-tel-metric.high-speed{color:#FF4757;animation:cockpitCriticalFlash 1.5s ease-in-out infinite;}
 .qv-tel-alerts{display:flex;gap:3px;flex-wrap:wrap;margin-top:2px;}
 .qv-tel-alert-tag{font-size:8px;padding:1px 5px;border-radius:3px;background:rgba(255,71,87,.2);color:#FF4757;border:1px solid rgba(255,71,87,.4);text-transform:uppercase;letter-spacing:.3px;font-weight:700;}
+/* WhatsApp button + Pool status tag (Fase 1 + 4 parcial) */
+.qv-tel-wa{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#25D366;color:#fff;text-decoration:none;font-size:13px;margin-left:4px;transition:transform .15s,box-shadow .15s;box-shadow:0 2px 6px rgba(37,211,102,.4)}
+.qv-tel-wa:hover{transform:scale(1.15);box-shadow:0 4px 12px rgba(37,211,102,.6)}
+.qv-tel-pool-tag{font-size:8px;padding:1px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:.3px;font-weight:700;border:1px solid}
+.qv-tel-pool-tag.pool-ativo{background:rgba(0,212,170,.2);color:#00D4AA;border-color:rgba(0,212,170,.4)}
+.qv-tel-pool-tag.pool-churn{background:rgba(255,71,87,.2);color:#FF4757;border-color:rgba(255,71,87,.4)}
+.qv-tel-pool-tag.pool-outro{background:rgba(255,165,2,.2);color:#FFA502;border-color:rgba(255,165,2,.4)}
 .qv-tel-stale{opacity:.55;filter:grayscale(.5);}
 .qv-tel-stale::before{content:'⏱ dados antigos · ';color:var(--text3);font-weight:400;}
 [data-theme="dark"] .qv-telemetry{background:linear-gradient(135deg,rgba(0,212,170,.18),rgba(0,212,170,.06));}
@@ -6187,6 +6219,13 @@ if (document.readyState === 'loading') {
 const GEOTAB_CFG_KEY = 'ssp36_geotab_config';
 let geotabConfig = (()=>{ try { return JSON.parse(localStorage.getItem(GEOTAB_CFG_KEY) || '{}'); } catch(e){ return {}; } })();
 let geotabData = {}; // indexado por motorista normalizado (lowercase, sem acento)
+// ── Pool de Veículos ML — mapeamento placa → {ssp, motorista, tel, perfil, status}
+// Carregado do Firebase /pool/mapping (populado via XLSX import do Novo Pool de Veículos Last Mile)
+let poolMapping = {};           // { PLACA: {ssp, motorista, tel, perfil, status, lideranca} }
+let poolByName = {};            // { nome_normalizado: {placa, ssp, tel, ...} } — lookup reverso
+let poolBySSP  = {};            // { SSP6: [placa1, placa2, ...] } — filtro por operação
+let poolLastSync = null;
+let _poolFbRef = null;
 let geotabByPlate = {};
 let geotabRefreshTimer = null;
 let geotabLastSync = null;
@@ -6409,17 +6448,29 @@ function updateGeotabBadge(){
   const txt = document.getElementById('geotabBadgeText');
   if (!btn || !txt) return;
   btn.classList.remove('geotab-on','geotab-off','geotab-err');
+  const hasCfg = !!(geotabConfig.csvUrl || geotabConfig.mode === 'firebase');
+  const poolN = Object.keys(poolMapping || {}).length;
+  // Conta placas do SSP atual (quando aplicável)
+  const sspN = (currentOperation && poolBySSP[currentOperation]) ? poolBySSP[currentOperation].length : 0;
   if (geotabLastError) {
     btn.classList.add('geotab-err');
     txt.textContent = 'Geotab ERRO';
-  } else if (!geotabConfig.csvUrl) {
+  } else if (!hasCfg) {
     btn.classList.add('geotab-off');
-    txt.textContent = 'Geotab OFF';
+    txt.textContent = poolN ? `OFF · Pool ${poolN}` : 'Geotab OFF';
   } else {
     btn.classList.add('geotab-on');
     const n = Object.keys(geotabByPlate).length;
     const when = geotabLastSync ? new Date(geotabLastSync).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) : '—';
-    txt.textContent = `Geotab · ${n} vans · ${when}`;
+    let msg = `Geotab · ${n} vans · ${when}`;
+    if (poolN) {
+      if (currentOperation && currentOperation !== 'GERAL' && currentOperation !== 'HISTORICO' && sspN > 0) {
+        msg += ` · Pool: ${sspN} no ${currentOperation}`;
+      } else {
+        msg += ` · Pool ${poolN}`;
+      }
+    }
+    txt.textContent = msg;
   }
 }
 
@@ -6427,35 +6478,124 @@ function updateGeotabBadge(){
 function getGeotabFor(d){
   if (!d) return null;
   const nm = _normName(d.nome || '');
-  if (nm && geotabData[nm]) return geotabData[nm];
+  if (!nm) return null;
+  // ── FLUXO NOVO (com pool):
+  // 1. Lookup no pool pelo nome → descobre a placa do motorista
+  // 2. Busca essa placa no geotabByPlate (dados Geotab por placa)
+  // 3. Se pool diz que ssp != currentOperation, NÃO mostra (vai pro SSP certo)
+  const poolEntry = poolByName[nm];
+  if (poolEntry && poolEntry.placa) {
+    // Se já carregamos pool e esse motorista está vinculado a outro SSP, não mostra aqui
+    if (currentOperation && currentOperation !== 'GERAL' && currentOperation !== 'HISTORICO'
+        && poolEntry.ssp && poolEntry.ssp !== currentOperation) return null;
+    const placaKey = (poolEntry.placa || '').toUpperCase().replace(/[.$#\[\]\/]/g,'_').replace(/\s+/g,'_').replace(/[|\\<>:;,"'`()]/g,'_').replace(/__+/g,'_').replace(/^_+|_+$/g,'').slice(0,80);
+    if (placaKey && geotabByPlate[placaKey]) {
+      // Enriquece com info do pool (tel, perfil, liderança)
+      return Object.assign({}, geotabByPlate[placaKey], {
+        tel_meli: poolEntry.tel, perfil_meli: poolEntry.perfil,
+        lideranca: poolEntry.lideranca, status_pool: poolEntry.status,
+        matched_by: 'pool'
+      });
+    }
+    // Pool conhece a placa mas Geotab não tem dado dela — ainda é útil
+    return {
+      placa: poolEntry.placa, nomeCompleto: poolEntry.motorista || d.nome,
+      status: 'SEM_DADOS_GEOTAB', velocidade: 0, lat: null, lon: null,
+      lastUpdate: null, alertas: [],
+      tel_meli: poolEntry.tel, perfil_meli: poolEntry.perfil,
+      lideranca: poolEntry.lideranca, status_pool: poolEntry.status,
+      matched_by: 'pool-no-geotab'
+    };
+  }
+  // ── FALLBACK: match por nome direto (como antes) — pra motoristas novos não no pool
+  if (geotabData[nm]) return geotabData[nm];
   return null;
 }
+
+// ── POOL mapping Firebase listener ────────────────────────────────────────
+function startPoolListener(){
+  stopPoolListener();
+  if (typeof firebase === 'undefined' || !firebase.database) return;
+  try {
+    _poolFbRef = firebase.database().ref('pool/mapping');
+    _poolFbRef.on('value', snap => {
+      const data = snap.val();
+      if (!data || !data.mapping) { poolMapping = {}; poolByName = {}; poolBySSP = {}; poolLastSync = null; return; }
+      poolMapping = data.mapping;
+      poolByName = {};
+      poolBySSP = {};
+      Object.keys(poolMapping).forEach(placaKey => {
+        const e = poolMapping[placaKey];
+        if (!e) return;
+        if (e.motorista) poolByName[_normName(e.motorista)] = Object.assign({}, e);
+        if (e.ssp) {
+          if (!poolBySSP[e.ssp]) poolBySSP[e.ssp] = [];
+          poolBySSP[e.ssp].push(placaKey);
+        }
+      });
+      poolLastSync = data.updatedAt || Date.now();
+      console.log('[pool] carregado — ' + Object.keys(poolMapping).length + ' placas, ' + Object.keys(poolBySSP).length + ' SSPs');
+      // Re-render se já tiver drivers importados
+      try {
+        if (drivers && drivers.length && typeof renderQuickView === 'function') renderQuickView();
+        if (typeof renderBehavAlertSection === 'function') renderBehavAlertSection();
+      } catch(e){ console.error('[pool] render:', e); }
+    }, err => console.warn('[pool] listener err:', err));
+  } catch(e) { console.error('[pool]', e); }
+}
+function stopPoolListener(){ if (_poolFbRef) { try { _poolFbRef.off(); } catch(e){} _poolFbRef = null; } }
+
+// Inicia o listener do pool assim que Firebase conectar
+(function initPoolListener(){
+  const kick = () => {
+    if (typeof firebase !== 'undefined' && firebase.database) {
+      startPoolListener();
+    }
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(kick, 1500));
+  else setTimeout(kick, 1500);
+})();
 
 // Monta o HTML do bloco telemetria para um driver
 function renderGeotabBlock(d){
   const g = getGeotabFor(d);
   if (!g) return '';
   const statusMap = {
-    EM_MOVIMENTO:   { cls: 'status-movendo', label: '🟢 Movendo' },
-    PARADO_LIGADO:  { cls: 'status-parado',  label: '🟡 Parado' },
-    IGNICAO_OFF:    { cls: 'status-off',     label: '🟣 Off' },
-    SEM_DADOS:      { cls: 'status-off',     label: '⚫ Sem dados' },
-    'NÃO ENCONTRADA':{ cls: 'status-off',    label: '⚫ N/E' },
+    EM_MOVIMENTO:    { cls: 'status-movendo', label: '🟢 Movendo' },
+    PARADO_LIGADO:   { cls: 'status-parado',  label: '🟡 Parado' },
+    IGNICAO_OFF:     { cls: 'status-off',     label: '🟣 Off' },
+    SEM_DADOS:       { cls: 'status-off',     label: '⚫ Sem dados' },
+    SEM_DADOS_GEOTAB:{ cls: 'status-off',     label: '📄 só Pool' },
+    'NÃO ENCONTRADA':{ cls: 'status-off',     label: '⚫ N/E' },
   };
   const st = statusMap[g.status] || statusMap.SEM_DADOS;
   const isStale = g.lastUpdate && (Date.now() - new Date(g.lastUpdate).getTime()) > 10*60*1000;
   const speedCls = g.velocidade > 80 ? 'high-speed' : '';
   const alertTags = (g.alertas||[]).slice(0,3).map(a=>`<span class="qv-tel-alert-tag">${a}</span>`).join('');
+  // Botão WhatsApp se tem tel do pool (Fase 4 parcial)
+  let waBtn = '';
+  if (g.tel_meli && String(g.tel_meli).length >= 10) {
+    const telClean = String(g.tel_meli).replace(/[^0-9]/g,'');
+    const msgPadrao = encodeURIComponent('Olá! Falando do time ' + (currentOperation||'ML') + '.');
+    waBtn = `<a class="qv-tel-wa" href="https://wa.me/${telClean}?text=${msgPadrao}" target="_blank" title="WhatsApp motorista" onclick="event.stopPropagation()">💬</a>`;
+  }
+  // Tag de status Pool (Ativo / Churn / Declínio)
+  let poolTag = '';
+  if (g.status_pool) {
+    const poolCls = /ativ/i.test(g.status_pool) ? 'pool-ativo' : /churn/i.test(g.status_pool) ? 'pool-churn' : 'pool-outro';
+    poolTag = `<span class="qv-tel-pool-tag ${poolCls}" title="Status no Pool ML">${g.status_pool}</span>`;
+  }
   return `<div class="qv-telemetry ${st.cls} ${isStale?'qv-tel-stale':''}">
     <div class="qv-tel-row">
       <span class="qv-tel-placa">🚐 ${g.placa}</span>
       <span class="qv-tel-status">${st.label}</span>
+      ${waBtn}
     </div>
     <div class="qv-tel-row">
-      <span class="qv-tel-metric ${speedCls}">⚡ <strong>${g.velocidade}</strong> km/h</span>
-      <span class="qv-tel-metric">📏 <strong>${g.kmHoje}</strong> km hoje</span>
+      <span class="qv-tel-metric ${speedCls}">⚡ <strong>${g.velocidade||0}</strong> km/h</span>
+      <span class="qv-tel-metric">📏 <strong>${g.kmHoje||0}</strong> km hoje</span>
     </div>
-    ${alertTags ? `<div class="qv-tel-alerts">${alertTags}</div>` : ''}
+    ${(alertTags || poolTag) ? `<div class="qv-tel-alerts">${alertTags}${poolTag}</div>` : ''}
   </div>`;
 }
 
