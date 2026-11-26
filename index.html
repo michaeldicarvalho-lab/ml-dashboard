@@ -5654,35 +5654,48 @@ autoConnect();
     finalText = _cleanFinal(finalText);
     if (!finalText) return;
     const match = String(finalText).match(/^(-?[\d.,]+)(.*)$/);
-    if (!match) { el.textContent = finalText; return; }
+    if (!match) {
+      el._suspendObserver = true;
+      el.textContent = finalText;
+      el._lastText = finalText;
+      setTimeout(() => { el._suspendObserver = false; }, 50);
+      return;
+    }
     const numStr = match[1].replace(/\./g,'').replace(',','.');
     const target = parseFloat(numStr);
     const suffix = match[2] || '';
     if (!isFinite(target) || target === 0) {
+      el._suspendObserver = true;
       el.textContent = finalText.replace(/^-0/, '0');
       el._lastText = el.textContent;
       el.classList.remove('counter-animating');
+      setTimeout(() => { el._suspendObserver = false; }, 50);
       return;
     }
     const hasDecimal = numStr.includes('.');
     const dur = 650;
     const start = performance.now();
     el.classList.add('counter-animating');
+    el._suspendObserver = true; // ← CRÍTICO: evita loop com MutationObserver durante animação
     el._animToken = (el._animToken || 0) + 1;
     const myToken = el._animToken;
     function tick(now){
-      if (el._animToken !== myToken) return;
+      if (el._animToken !== myToken) { el._suspendObserver = false; return; }
       const elapsed = now - start;
       const t = Math.min(elapsed / dur, 1);
       const current = _fixZero(target * EASE_OUT(t));
       let txt;
       if (hasDecimal) txt = current.toFixed(1).replace('.', ',');
       else txt = Math.round(current).toLocaleString('pt-BR');
-      // Defensive: remove sinal negativo leading
       txt = txt.replace(/^-(?=0(?:\b|,|\.))/, '');
       el.textContent = txt + suffix;
       if (t < 1) requestAnimationFrame(tick);
-      else { el.textContent = finalText; el.classList.remove('counter-animating'); el._lastText = finalText; }
+      else {
+        el.textContent = finalText;
+        el.classList.remove('counter-animating');
+        el._lastText = finalText;
+        setTimeout(() => { el._suspendObserver = false; }, 100);
+      }
     }
     requestAnimationFrame(tick);
   }
@@ -5721,11 +5734,13 @@ autoConnect();
       el._observed = true;
       el._lastText = el.textContent;
       const mo = new MutationObserver(() => {
+        // Se a animação está ativa modificando textContent iterativamente,
+        // ignora — senão vira loop infinito (counter-up escreve → MO lê → anima → ...).
+        if (el._suspendObserver) return;
         // Lê e normaliza "-0" → "0" antes de comparar/propagar
         let newText = el.textContent;
         const cleaned = _cleanFinal(newText);
         if (cleaned !== newText) {
-          // Previne loop: desconecta MO temporariamente, corrige DOM, reconecta
           mo.disconnect();
           el.textContent = cleaned;
           newText = cleaned;
